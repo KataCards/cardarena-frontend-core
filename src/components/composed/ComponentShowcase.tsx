@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/Button';
 import { FeatureCard } from '@/components/ui/FeatureCard';
 import { TestimonialCard } from '@/components/ui/TestimonialCard';
 import { PricingCard } from '@/components/ui/PricingCard';
-import { Trophy, Zap, Star } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 
 export function ComponentShowcase() {
   return (
