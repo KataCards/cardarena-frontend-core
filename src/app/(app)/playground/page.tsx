@@ -1,12 +1,16 @@
+'use client';
+
 import { Sidebar } from "@/components/layout/Sidebar";
 import { RoundBanner } from "@/components/composed/RoundBanner";
 import { Scoreboard } from "@/components/composed/Scoreboard";
 import { MatchGrid } from "@/components/composed/MatchGrid";
 import { MatchHistory } from "@/components/composed/MatchHistory";
 import { Timer } from "@/components/ui/Timer";
-import type { SidebarLinkItem } from "@/types/ui/sidebar";
-import type { ScoreboardItem } from "@/types/ui/scoreboard";
-import type { MatchItem } from "@/types/ui/match";
+import { 
+  sidebarLinks, 
+  scoreboardItems, 
+  matchItems 
+} from "@/_data/mock";
 
 /**
  * Visual wrapper for components in the playground.
@@ -30,51 +34,20 @@ function PlaygroundSection({ name, description, children }: { name: string; desc
 /**
  * Component Playground (Container)
  * A living documentation page that showcases all refactored "Skin" components.
+ * Marked as 'use client' to allow passing event handlers to children.
  */
-export default async function PlaygroundPage() {
-  // 1. Mock Data for Showcase
-  const sidebarLinks: SidebarLinkItem[] = [
-    { label: "Dashboard", href: "#", iconName: "home" },
-    { label: "Playground", href: "/playground", iconName: "gamepad", isActive: true },
-    { label: "Turniere", href: "#", iconName: "trophy" },
-    { label: "Spieler", href: "#", iconName: "users" },
-    { label: "Einstellungen", href: "#", iconName: "settings" },
-  ];
-
-  const scoreboardItems: ScoreboardItem[] = [
-    { id: "1", rank: 1, name: "Maximilian Mustermann", username: "max_power", points: 15 },
-    { id: "2", rank: 2, name: "Sarah Schmidt", username: "lucky_sarah", points: 12 },
-    { id: "3", rank: 3, name: "Tim Test", points: 10 },
-    { id: "4", rank: 4, name: "Julia Jung", username: "jj_cards", points: 8 },
-  ];
-
-  const matchItems: MatchItem[] = [
-    {
-      id: "m1",
-      tableNumber: 1,
-      status: "completed",
-      statusLabel: "Abgeschlossen",
-      player1: { name: "Max Power", isWinner: true },
-      player2: { name: "Sarah Schmidt", isLoser: true },
-    },
-    {
-      id: "m2",
-      tableNumber: 2,
-      status: "pending",
-      statusLabel: "Laufend",
-      player1: { name: "Tim Test" },
-      player2: { name: "Julia Jung" },
-    },
-  ];
-
+export default function PlaygroundPage() {
   return (
     <div className="flex min-h-screen bg-gray-50/50">
       {/* Sidebar Showcase */}
       <Sidebar 
         brandName="CardArena" 
-        links={sidebarLinks}
+        links={sidebarLinks.map(l => ({ ...l, isActive: l.href === '/playground' }))}
         user={{ username: "Admin User" }}
-        onLogout={() => console.log("Logout triggered")}
+        onLogout={async () => {
+          console.log("Logout triggered in playground");
+          alert("Logout triggered (Example)");
+        }}
       />
       
       <main className="flex-1 p-12 overflow-y-auto">
@@ -83,7 +56,7 @@ export default async function PlaygroundPage() {
             Component <span className="text-red-600 italic underline decoration-wavy decoration-red-200">Playground</span>
           </h1>
           <p className="text-xl text-gray-500 font-medium max-w-2xl">
-            Dies ist eine lebende Dokumentation unserer refactored "Skin" Komponenten. 
+            Dies ist eine lebende Dokumentation unserer refactored &quot;Skin&quot; Komponenten. 
             Jedes Element hier ist 100% stateless and wird ausschließlich über Props gesteuert.
           </p>
         </header>

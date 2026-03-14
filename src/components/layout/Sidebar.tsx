@@ -2,7 +2,7 @@
 
 import { Home, Trophy, Users, Settings, Gamepad2, LogOut, type LucideIcon } from "lucide-react";
 import Link from 'next/link';
-import type { SidebarProps, SidebarLinkItem } from "@/types/ui/sidebar";
+import type { SidebarProps } from "@/types/ui/sidebar";
 
 const iconMap: Record<string, LucideIcon> = {
   home: Home,
