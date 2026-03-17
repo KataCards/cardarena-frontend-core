@@ -126,7 +126,12 @@ export function Stats({
         <div className={`grid grid-cols-2 ${gridCols[columns]} gap-8`}>
           {stats.map((stat, index) => {
             const Icon = stat.icon;
-            const valueColor = statVariants[stat.variant || "default"];
+            
+            // Adjust default text color based on the section variant (dark mode)
+            let valueColor = statVariants[stat.variant || "default"];
+            if (!stat.variant && variant === "dark") {
+              valueColor = "text-white";
+            }
             
             return (
               <div key={index} className="text-center">

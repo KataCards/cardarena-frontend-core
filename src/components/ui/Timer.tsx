@@ -64,7 +64,8 @@ function formatTime(seconds: number): string {
   const abs = Math.abs(seconds);
   const mins = Math.floor(abs / 60);
   const secs = abs % 60;
-  const prefix = seconds < 0 ? '-' : '';
+  // Add a non-breaking space after the minus sign for better visual spacing
+  const prefix = seconds < 0 ? '-\u200A' : '';
   return `${prefix}${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 }
 
@@ -194,7 +195,7 @@ export function Timer({
             </>
           )}
           <span
-            className={`font-black tracking-tighter tabular-nums leading-none ${sizeConfig.text} ${styles.text}`}
+            className={`font-bold tabular-nums leading-none ${sizeConfig.text} ${styles.text}`}
           >
             {formatTime(timeLeft)}
           </span>

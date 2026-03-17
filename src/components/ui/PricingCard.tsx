@@ -7,6 +7,8 @@ export interface PricingCardProps {
   name: string;
   /** Price display (can include currency, period, etc.) */
   price: string | ReactNode;
+  /** Optional text displayed next to or below the price (e.g., "per user / month") */
+  priceDescription?: string;
   /** Optional plan description */
   description?: string;
   /** List of features included in the plan */
@@ -104,6 +106,7 @@ const highlightColors = {
 export function PricingCard({
   name,
   price,
+  priceDescription,
   description,
   features,
   buttonText,
@@ -142,8 +145,13 @@ export function PricingCard({
       {description && <p className="text-sm text-gray-600 mb-4">{description}</p>}
 
       {/* Price */}
-      <div className="text-3xl font-bold text-gray-900 mb-6">
-        {typeof price === "string" ? price : price}
+      <div className="mb-6">
+        <div className="text-3xl font-bold text-gray-900">
+          {typeof price === "string" ? price : price}
+        </div>
+        {priceDescription && (
+          <p className="text-sm text-gray-500 mt-1">{priceDescription}</p>
+        )}
       </div>
 
       {/* Features */}
