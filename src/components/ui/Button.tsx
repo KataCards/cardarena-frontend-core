@@ -1,13 +1,21 @@
 import { ReactNode, ButtonHTMLAttributes, AnchorHTMLAttributes, ElementType } from 'react';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Visual style variant */
   variant?: 'solid' | 'secondary' | 'outline' | 'ghost';
+  /** Color scheme for the button */
   colorScheme?: 'red' | 'dark' | 'gray';
+  /** Button size */
   size?: 'md' | 'lg';
+  /** Whether button should take full width of container */
   fullWidth?: boolean;
+  /** Button content */
   children: ReactNode;
+  /** Optional href to render as link instead of button */
   href?: string;
+  /** Optional icon component to display */
   icon?: ElementType;
+  /** Position of the icon relative to text */
   iconPosition?: 'left' | 'right';
 }
 
@@ -34,6 +42,60 @@ const variantStyles = {
   },
 };
 
+/**
+ * Button
+ * 
+ * A versatile button component that supports multiple variants, color schemes, sizes,
+ * and can render as either a button or link element. Includes icon support and
+ * full accessibility features.
+ * 
+ * @example
+ * // Basic solid button
+ * import { Button } from "@/components/ui/Button";
+ * 
+ * <Button>Click me</Button>
+ * 
+ * @example
+ * // Button with icon and variants
+ * import { ArrowRight, Download, Trash } from "lucide-react";
+ * 
+ * <Button variant="solid" colorScheme="red" icon={ArrowRight} iconPosition="right">
+ *   Get Started
+ * </Button>
+ * 
+ * <Button variant="outline" colorScheme="dark" icon={Download}>
+ *   Download
+ * </Button>
+ * 
+ * <Button variant="ghost" colorScheme="gray" icon={Trash} size="md">
+ *   Delete
+ * </Button>
+ * 
+ * @example
+ * // Button as link
+ * <Button href="/signup" variant="solid" colorScheme="red" size="lg">
+ *   Sign Up Now
+ * </Button>
+ * 
+ * @example
+ * // Full width button with loading state
+ * <Button 
+ *   fullWidth 
+ *   disabled={isLoading}
+ *   onClick={handleSubmit}
+ * >
+ *   {isLoading ? "Saving..." : "Save Changes"}
+ * </Button>
+ * 
+ * @example
+ * // All variants showcase
+ * <div className="space-y-4">
+ *   <Button variant="solid" colorScheme="red">Solid Red</Button>
+ *   <Button variant="secondary" colorScheme="red">Secondary Red</Button>
+ *   <Button variant="outline" colorScheme="dark">Outline Dark</Button>
+ *   <Button variant="ghost" colorScheme="gray">Ghost Gray</Button>
+ * </div>
+ */
 export function Button({
   variant = 'solid',
   colorScheme = 'red',

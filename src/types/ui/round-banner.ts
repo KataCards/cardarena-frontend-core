@@ -1,25 +1,26 @@
 export type BannerVariant = 'success' | 'warning' | 'info' | 'error' | 'neutral' | 'accent';
 
-export type BannerIcon = 'play' | 'pause' | 'check' | 'clock' | 'settings' | 'alert';
-
 /**
- * Props for the RoundBanner component.
+ * Props for the StatusBanner component.
  */
-export interface RoundBannerProps {
-  /** Tournament status display info */
-  tournamentStatus: {
+export interface StatusBannerProps {
+  /** Primary status display info */
+  primaryStatus: {
     label: string;
     value: string;
     variant: BannerVariant;
   };
-  /** Optional current round info */
-  roundInfo?: {
-    number: number;
+  /** Optional center section info (e.g., round, phase, stage) */
+  centerInfo?: {
+    label: string;
+    value: string | number;
     statusLabel: string;
-    iconName: BannerIcon;
+    icon: React.ComponentType<{ className?: string }>;
+    animateIcon?: boolean;
   };
-  /** Participant occupancy info */
-  participants: {
+  /** Secondary status display info (e.g., participants, capacity, slots) */
+  secondaryStatus: {
+    label: string;
     current: number;
     max: number;
   };
@@ -28,7 +29,7 @@ export interface RoundBannerProps {
   /** Optional list of supporting messages with icons */
   subMessages?: Array<{
     text: string;
-    iconName: BannerIcon;
+    icon: React.ComponentType<{ className?: string }>;
   }>;
   /** Overall visual style variant for the banner */
   variant: BannerVariant;

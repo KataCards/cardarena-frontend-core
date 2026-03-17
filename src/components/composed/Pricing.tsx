@@ -1,25 +1,79 @@
-import { PricingPlan } from '@/types/ui/pricingplan';
-import { PricingCard } from '@/components/ui/PricingCard';
+// components/composed/Pricing.tsx
+import { PricingPlan } from "@/types/ui/pricingplan";
+import { PricingCard } from "@/components/ui/PricingCard";
 
 interface PricingProps {
+  /** Array of pricing plans to display */
   plans: PricingPlan[];
+  /** Main heading text for the pricing section */
+  title?: string;
+  /** Supporting description text below the title */
+  description?: string;
+  /** Background color variant */
+  variant?: "light" | "white" | "dark";
 }
 
-export function Pricing({ plans }: PricingProps) {
+/**
+ * Pricing Section
+ * 
+ * Displays a responsive grid of pricing plans with customizable heading and styling.
+ * Automatically adapts from single column on mobile to three columns on desktop.
+ * 
+ * @example
+ * // Basic usage with default styling
+ * <Pricing plans={pricingPlans} />
+ * 
+ * @example
+ * // Custom heading and description
+ * <Pricing 
+ *   plans={plans}
+ *   title="Choose Your Plan"
+ *   description="Flexible pricing for teams of all sizes"
+ * />
+ * 
+ * @example
+ * // Dark variant for light-themed pages
+ * <Pricing 
+ *   plans={plans}
+ *   variant="dark"
+ *   title="Simple, Transparent Pricing"
+ *   description="No hidden fees. Cancel anytime."
+ * />
+ */
+export function Pricing({ 
+  plans,
+  title = "Simple Pricing",
+  description = "Choose the plan that fits your needs",
+  variant = "light",
+}: PricingProps) {
+  const variants = {
+    light: "bg-gray-50",
+    white: "bg-white",
+    dark: "bg-slate-900",
+  };
+
+  const textColors = {
+    light: { title: "text-gray-900", description: "text-gray-600" },
+    white: { title: "text-gray-900", description: "text-gray-600" },
+    dark: { title: "text-white", description: "text-slate-300" },
+  };
+
+  const colors = textColors[variant];
+
   return (
-    <section id="pricing" className="py-20 bg-gray-50">
+    <section className={`py-20 ${variants[variant]}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Einfache Preisgestaltung
+        <header className="text-center mb-16">
+          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${colors.title}`}>
+            {title}
           </h2>
-          <p className="text-xl text-gray-600">
-            Wähle den Plan, der zu deinen Bedürfnissen passt
+          <p className={`text-xl ${colors.description}`}>
+            {description}
           </p>
-        </div>
+        </header>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
-            <PricingCard key={index} {...plan} />
+            <PricingCard key={plan.name || index} {...plan} />
           ))}
         </div>
       </div>

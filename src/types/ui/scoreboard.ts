@@ -1,32 +1,41 @@
 /**
- * Represents a single participant's score entry.
+ * Represents a single ranked item in the list.
  */
-export interface ScoreboardItem {
-  /** Unique identifier for the participant */
+export interface RankedItem {
+  /** Unique identifier for the item */
   id: string;
-  /** Current rank in the tournament */
+  /** Current rank position */
   rank: number;
-  /** Display name for the player */
-  name: string;
-  /** Optional username for additional identity */
-  username?: string;
-  /** Total points accumulated */
-  points: number;
-  /** Optional flag for special player status */
-  isSpecial?: boolean;
+  /** Primary display text */
+  label: string;
+  /** Optional secondary text (e.g., username, subtitle) */
+  sublabel?: string;
+  /** Primary metric value */
+  value: number;
+  /** Optional label for the metric (e.g., "Points", "Score", "Wins") */
+  valueLabel?: string;
+  /** Optional icon component to display */
+  icon?: React.ComponentType<{ className?: string }>;
+  /** Optional custom styling for this item */
+  className?: string;
 }
 
 /**
- * Props for the Scoreboard component.
+ * Props for the RankedList component.
  */
-export interface ScoreboardProps {
-  /** The title displayed at the top of the scoreboard */
+export interface RankedListProps {
+  /** Array of ranked items to display */
+  items: RankedItem[];
+  /** Optional heading text for the list */
   title?: string;
-  /** Pre-sorted list of score entries */
-  items: ScoreboardItem[];
-  /** Optional summary stats displayed in the footer */
-  footerStats?: {
-    currentCount: number;
-    maxCount: number;
-  };
+  /** Optional icon component for the title */
+  titleIcon?: React.ComponentType<{ className?: string }>;
+  /** Default label for metric values when not specified per item */
+  defaultValueLabel?: string;
+  /** Message to display when list is empty */
+  emptyMessage?: string;
+  /** Maximum height before scrolling (e.g., "400px", "96") */
+  maxHeight?: string;
+  /** Optional footer content */
+  footer?: React.ReactNode;
 }

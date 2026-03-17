@@ -30,8 +30,8 @@ export interface QuickActionItem {
   title: string;
   /** Target navigation URL */
   href: string;
-  /** Name of the icon to display */
-  iconName: string;
+  /** Icon component to display (e.g., from lucide-react) */
+  icon: React.ComponentType<{ className?: string }>;
   /** CSS background color class */
   colorClass: string;
 }
