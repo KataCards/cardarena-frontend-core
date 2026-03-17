@@ -1,4 +1,16 @@
-import type { MatchCardProps } from "@/types/ui/bracket";
+import type { BracketMatch } from "@/types/ui/bracket";
+
+/**
+ * Props for the MatchCard component.
+ */
+export interface MatchCardProps {
+  /** The match data to display */
+  match: BracketMatch;
+  /** Callback triggered when the card is clicked */
+  onClick?: (id: string) => void;
+  /** Additional CSS classes */
+  className?: string;
+}
 
 /**
  * MatchCard

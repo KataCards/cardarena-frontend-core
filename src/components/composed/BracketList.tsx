@@ -1,5 +1,15 @@
 import { MatchCard } from "@/components/ui/MatchCard";
-import type { BracketListProps } from "@/types/ui/bracket";
+import type { BracketMatch } from "@/types/ui/bracket";
+
+/**
+ * Props for the BracketList component.
+ */
+export interface BracketListProps {
+  /** List of matches to display in the grid */
+  matches: BracketMatch[];
+  /** Callback triggered when any match card is clicked */
+  onMatchSelect?: (matchId: string) => void;
+}
 
 /**
  * BracketList component (Presenter)

@@ -1,6 +1,14 @@
 // components/composed/Pricing.tsx
-import { PricingPlan } from "@/types/ui/pricingplan";
 import { PricingCard } from "@/components/ui/PricingCard";
+
+export interface PricingPlan {
+  name: string;
+  price: string;
+  features: string[];
+  buttonText: string;
+  isPopular?: boolean;
+  isContact?: boolean;
+}
 
 interface PricingProps {
   /** Array of pricing plans to display */

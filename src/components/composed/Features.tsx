@@ -1,6 +1,12 @@
 // components/composed/Features.tsx
-import { Feature } from "@/types/ui/feature";
 import { FeatureCard } from "@/components/ui/FeatureCard";
+import { ReactNode } from "react";
+
+export interface Feature {
+  icon: ReactNode;
+  title: string;
+  description: string;
+}
 
 interface FeaturesProps {
   /** Array of feature objects to display in the grid */

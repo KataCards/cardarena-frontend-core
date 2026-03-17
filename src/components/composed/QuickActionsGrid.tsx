@@ -1,6 +1,20 @@
 // components/composed/QuickActionsGrid.tsx
 import Link from "next/link";
-import type { QuickActionItem } from "@/types/ui/dashboard";
+import React from "react";
+
+/**
+ * Definition for a quick action button.
+ */
+export interface QuickActionItem {
+  /** Display label */
+  title: string;
+  /** Target navigation URL */
+  href: string;
+  /** Icon component to display (e.g., from lucide-react) */
+  icon: React.ComponentType<{ className?: string }>;
+  /** CSS background color class */
+  colorClass: string;
+}
 
 interface QuickActionsGridProps {
   /** Array of action items to display in the grid */

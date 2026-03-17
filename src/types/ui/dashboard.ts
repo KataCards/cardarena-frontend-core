@@ -6,7 +6,7 @@ export interface TournamentSummary {
   id: string;
   /** Display name of the tournament */
   name: string;
-  /** Current state (e.g., 'running', 'planned') */
+  /** Current state (e.g., 'running', 'registration', 'planned', 'finished', 'cancelled') */
   state: 'running' | 'registration' | 'planned' | 'finished' | 'cancelled';
   /** Human-readable state text */
   stateLabel: string;
@@ -20,18 +20,4 @@ export interface TournamentSummary {
   maxPlayers: number;
   /** Name of the card game being played */
   gameName: string;
-}
-
-/**
- * Definition for a quick action button.
- */
-export interface QuickActionItem {
-  /** Display label */
-  title: string;
-  /** Target navigation URL */
-  href: string;
-  /** Icon component to display (e.g., from lucide-react) */
-  icon: React.ComponentType<{ className?: string }>;
-  /** CSS background color class */
-  colorClass: string;
 }

@@ -1,6 +1,12 @@
 // components/composed/Testimonials.tsx
-import { Testimonial } from "@/types/ui/testimonial";
 import { TestimonialCard } from "@/components/ui/TestimonialCard";
+
+export interface Testimonial {
+  name: string;
+  role: string;
+  content: string;
+  rating: number;
+}
 
 interface TestimonialsProps {
   /** Array of testimonial objects to display */
