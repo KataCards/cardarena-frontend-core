@@ -19,6 +19,7 @@ import { Pricing } from "@/components/composed/Pricing";
 import { CTA } from "@/components/composed/CTA";
 import { TabSection } from "@/components/composed/TabSection";
 import { StatusBanner } from "@/components/composed/StatusBanner";
+import { QRRegistrationBanner } from "@/components/composed/QRRegistrationBanner";
 
 // UI Components
 import { Button } from "@/components/ui/Button";
@@ -571,6 +572,33 @@ export default function ComponentGallery() {
                 mainMessage="Early bird tickets available"
                 subMessages={[{ text: "Downtown Venue", icon: MapPin }]}
                 variant="success"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* QR Registration Banner */}
+        <section className="py-12 bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">QR Registration Banner</h3>
+            <div className="space-y-6">
+              <QRRegistrationBanner
+                registrationUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                title="Scan to Register"
+                description="Join the tournament by scanning this QR code with your phone"
+                variant="accent"
+              />
+              <QRRegistrationBanner
+                registrationUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                title="Quick Check-In"
+                description="Scan for instant event registration and updates"
+                variant="success"
+              />
+              <QRRegistrationBanner
+                registrationUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                title="Get Started Today"
+                description="Scan to create your player profile and join the community"
+                variant="default"
               />
             </div>
           </div>
