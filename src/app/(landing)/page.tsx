@@ -19,7 +19,7 @@ import { Pricing } from "@/components/composed/Pricing";
 import { CTA } from "@/components/composed/CTA";
 import { TabSection } from "@/components/composed/TabSection";
 import { StatusBanner } from "@/components/composed/StatusBanner";
-import { QRRegistrationBanner } from "@/components/composed/QRRegistrationBanner";
+import { QRRegistrationBanner } from "@/components/composed/WIP_QRRegistrationBanner";
 
 // UI Components
 import { Button } from "@/components/ui/Button";
