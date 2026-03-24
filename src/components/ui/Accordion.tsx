@@ -10,6 +10,7 @@ import {
 } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "./Button";
 
 /**
  * Props for individual accordion items
@@ -17,7 +18,7 @@ import { cn } from "@/lib/utils";
 export interface AccordionItemProps {
   /** Unique identifier for the accordion item. Used for tracking expanded state. */
   id: string;
-  /** Title or header content displayed in the trigger button */
+  /** Title or header content displayed in the trigger Button */
   title: ReactNode;
   /** Body content shown when the item is expanded */
   children: ReactNode;
@@ -75,7 +76,7 @@ export interface AccordionHeaderProps
   onToggle: (id: string) => void;
   /** Whether the header is disabled */
   disabled?: boolean;
-  /** Additional CSS classes for the header button */
+  /** Additional CSS classes for the header Button */
   className?: string;
   /** Child elements (typically title, icon, badge) */
   children: ReactNode;
@@ -280,7 +281,7 @@ export function AccordionItem({
 /**
  * AccordionHeader Component
  *
- * The clickable header/trigger button for an accordion item. Handles keyboard navigation
+ * The clickable header/trigger Button for an accordion item. Handles keyboard navigation
  * and accessibility attributes automatically.
  *
  * **Keyboard Support:**
@@ -288,7 +289,7 @@ export function AccordionItem({
  * - Arrow Up/Down: Navigate between accordion items (when used in a list)
  *
  * @param props - The header configuration
- * @returns The rendered accordion header button
+ * @returns The rendered accordion header Button
  *
  * @example
  * <AccordionHeader id="1" isExpanded={true} onToggle={handleToggle}>
@@ -320,7 +321,7 @@ export function AccordionHeader({
       const currentButton = e.currentTarget;
       const allButtons = Array.from(
         document.querySelectorAll<HTMLButtonElement>(
-          '[role="button"][aria-expanded]'
+          '[role="Button"][aria-expanded]'
         )
       );
       const currentIndex = allButtons.indexOf(currentButton);
@@ -339,9 +340,8 @@ export function AccordionHeader({
   };
 
   return (
-    <button
-      type="button"
-      role="button"
+    <Button
+      role="Button"
       onClick={() => !disabled && onToggle(id)}
       onKeyDown={handleKeyDown}
       disabled={disabled}
@@ -368,7 +368,7 @@ export function AccordionHeader({
         )}
         aria-hidden="true"
       />
-    </button>
+    </Button>
   );
 }
 
@@ -450,7 +450,7 @@ export function AccordionContent({
  *   </Accordion.Item>
  * </Accordion.Root>
  */
-Accordion.Root = Accordion
+Accordion.Root = AccordionContent
 Accordion.Item = AccordionItem;
 Accordion.Header = AccordionHeader;
 Accordion.Content = AccordionContent;
