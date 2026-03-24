@@ -1,16 +1,19 @@
-import { ReactNode } from "react";
+import { ReactNode, HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
-export interface BadgeProps {
+/**
+ * Props for the Badge component
+ */
+export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   /** Content to display inside the badge */
   children: ReactNode;
-  /** Visual variant of the badge */
+  /** Visual variant - determines color scheme. @default "default" */
   variant?: "default" | "success" | "warning" | "error" | "info" | "neutral";
-  /** Size of the badge */
+  /** Badge size. @default "md" */
   size?: "sm" | "md" | "lg";
-  /** Optional icon to display before the text */
+  /** Optional icon component to display before text. Should accept className and size props. */
   icon?: React.ComponentType<{ className?: string; size?: number }>;
-  /** Additional CSS classes */
+  /** Additional CSS classes to merge with defaults */
   className?: string;
 }
 
@@ -29,24 +32,37 @@ const sizeStyles = {
   lg: "text-base px-3 py-1",
 };
 
+const iconSizeMap = {
+  sm: 12,
+  md: 14,
+  lg: 16,
+};
+
 /**
  * Badge Component
- * 
- * A versatile badge component for displaying status, labels, or counts.
- * Supports multiple variants, sizes, and optional icons.
- * 
+ *
+ * A compact, versatile badge for displaying status, labels, counts, or tags.
+ * Supports 6 semantic variants, 3 sizes, optional icons, and full className customization.
+ *
+ * @param props - Badge configuration
+ * @returns The rendered badge element
+ *
  * @example
  * // Basic usage
  * <Badge>New</Badge>
- * 
+ *
  * @example
  * // With variant and size
  * <Badge variant="success" size="lg">Active</Badge>
- * 
+ *
  * @example
  * // With icon
  * import { CheckCircle } from "lucide-react";
  * <Badge variant="success" icon={CheckCircle}>Completed</Badge>
+ *
+ * @example
+ * // Custom styling
+ * <Badge className="bg-purple-100 text-purple-800">Custom</Badge>
  */
 export function Badge({
   children,
@@ -54,17 +70,25 @@ export function Badge({
   size = "md",
   icon: Icon,
   className,
+  ...rest
 }: BadgeProps) {
   return (
     <span
       className={cn(
-        "inline-flex items-center font-medium rounded-full border",
+        "inline-flex items-center gap-1 font-medium rounded-full border",
         variantStyles[variant],
         sizeStyles[size],
         className
       )}
+      {...rest}
     >
-      {Icon && <Icon className="mr-1" size={size === "sm" ? 12 : size === "lg" ? 16 : 14} />}
+      {Icon && (
+        <Icon
+          className="shrink-0"
+          size={iconSizeMap[size]}
+          aria-hidden="true"
+        />
+      )}
       {children}
     </span>
   );

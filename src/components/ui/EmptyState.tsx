@@ -2,29 +2,17 @@ import { type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
-  /**
-   * Icon to display
-   */
+  // Icon to display
   icon: LucideIcon;
-  /**
-   * Size of the icon
-   */
+  // Size of the icon
   iconSize?: number;
-  /**
-   * Main heading text
-   */
+  //Main heading text
   title: string;
-  /**
-   * Description text
-   */
+  // Description text
   description: string;
-  /**
-   * Optional action button or element
-   */
+  // Optional action button or element
   action?: React.ReactNode;
-  /**
-   * Additional className for the container
-   */
+  // Additional className for the container
   className?: string;
 }
 
@@ -47,7 +35,7 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div className={cn("text-center py-12", className)}>
-      <Icon className="mx-auto h-12 w-12 text-gray-400 mb-4" size={iconSize} />
+      <Icon className="mx-auto text-gray-400 mb-4" size={iconSize}/>
       <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
       <p className="text-gray-500 mb-4">{description}</p>
       {action && <div>{action}</div>}

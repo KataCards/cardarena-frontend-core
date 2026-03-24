@@ -1,81 +1,94 @@
 import * as React from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Input, InputProps } from "./Input";
 
-interface PasswordInputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
-  /**
-   * Label for the input field
-   */
-  label?: string;
-  /**
-   * Error message to display
-   */
-  error?: string;
+interface PasswordInputProps extends Omit<InputProps, "type" | "rightSlot"> {
+  /** Accessible label for "show password" button. @default "Show password" */
+  showPasswordLabel?: string;
+  /** Accessible label for "hide password" button. @default "Hide password" */
+  hidePasswordLabel?: string;
 }
 
 /**
- * PasswordInput - A password input field with show/hide toggle
- * 
+ * PasswordInput Component
+ *
+ * A password input field with visibility toggle built on the slot-based Input primitive.
+ * Demonstrates how specialized inputs can be built in ~20 lines using the Input's slot architecture.
+ *
  * Features:
  * - Toggle visibility button with eye icons
- * - Optional label
- * - Error state display
+ * - Localized/customizable ARIA labels
+ * - Semantic color tokens (no hardcoded brand colors)
  * - Full input HTML attributes support
+ * - ForwardRef support for form libraries
  * - Accessible with proper ARIA attributes
+ *
+ * Design Philosophy:
+ * - Built on Input primitive using rightSlot
+ * - No label or error logic (use Label and FieldError components)
+ * - Localization-ready with customizable button labels
+ * - Type is locked to "password" (cannot be overridden)
+ *
+ * @param props - PasswordInput configuration
+ * @param ref - Forwarded ref to the input element
+ * @returns The rendered password input element
+ *
+ * @example
+ * // Basic usage
+ * <PasswordInput placeholder="Enter password" />
+ *
+ * @example
+ * // With custom labels (localization)
+ * <PasswordInput
+ *   showPasswordLabel="Mostrar contraseña"
+ *   hidePasswordLabel="Ocultar contraseña"
+ * />
+ *
+ * @example
+ * // Complete form field
+ * <div>
+ *   <Label htmlFor="password" required>Password</Label>
+ *   <PasswordInput id="password" />
+ *   <FieldError id="password-error">Password is required</FieldError>
+ * </div>
  */
-export const PasswordInput = React.forwardRef<
-  HTMLInputElement,
-  PasswordInputProps
->(({ label, error, className, disabled, id, ...props }, ref) => {
-  const [showPassword, setShowPassword] = React.useState(false);
-  const inputId = id || React.useId();
+export const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
+  (
+    {
+      showPasswordLabel = "Show password",
+      hidePasswordLabel = "Hide password",
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
+    const [showPassword, setShowPassword] = React.useState(false);
 
-  return (
-    <div className="w-full">
-      {label && (
-        <label
-          htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          {label}
-        </label>
-      )}
-      <div className="relative">
-        <input
-          ref={ref}
-          id={inputId}
-          type={showPassword ? "text" : "password"}
-          className={cn(
-            "w-full px-4 py-3 pr-12 border rounded-lg",
-            "focus:ring-2 focus:ring-red-500 focus:border-red-500",
-            "disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed",
-            "transition-colors",
-            error ? "border-red-300" : "border-gray-300",
-            className
-          )}
-          disabled={disabled}
-          aria-invalid={error ? "true" : "false"}
-          aria-describedby={error ? `${inputId}-error` : undefined}
-          {...props}
-        />
-        <button
-          type="button"
-          onClick={() => setShowPassword(!showPassword)}
-          className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors disabled:cursor-not-allowed"
-          disabled={disabled}
-          aria-label={showPassword ? "Passwort verbergen" : "Passwort anzeigen"}
-        >
-          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-        </button>
-      </div>
-      {error && (
-        <p id={`${inputId}-error`} className="mt-1 text-sm text-red-600">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-});
+    return (
+      <Input
+        ref={ref}
+        type={showPassword ? "text" : "password"}
+        disabled={disabled}
+        rightSlot={
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="text-muted-foreground hover:text-foreground transition-colors disabled:cursor-not-allowed"
+            disabled={disabled}
+            aria-label={showPassword ? hidePasswordLabel : showPasswordLabel}
+            tabIndex={-1}
+          >
+            {showPassword ? (
+              <EyeOff className="w-4 h-4" aria-hidden="true" />
+            ) : (
+              <Eye className="w-4 h-4" aria-hidden="true" />
+            )}
+          </button>
+        }
+        {...props}
+      />
+    );
+  }
+);
 
 PasswordInput.displayName = "PasswordInput";

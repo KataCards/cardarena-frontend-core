@@ -29,7 +29,7 @@ import { TestimonialCard } from "@/components/composed/display/TestimonialCard";
 import { PricingCard } from "@/components/composed/display/PricingCard";
 import { TournamentCard } from "@/components/composed/display/TournamentCard";
 import { MatchCard } from "@/components/composed/display/MatchCard";
-import { Timer } from "@/components/ui/Timer";
+import { Countdown } from "@/components/ui/Countdown";
 
 /**
  * Component Reference Gallery
@@ -362,20 +362,20 @@ export default function ComponentGallery() {
             <div className="mb-16">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Timers</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Timer
+                <Countdown
                   initialSeconds={1800}
                   size="md"
                   label="Round 1"
                   autoStart={false}
                 />
-                <Timer
+                <Countdown
                   initialSeconds={45}
                   size="md"
                   variant="danger"
                   lastMinuteMessage="Hurry Up!"
                   autoStart={false}
                 />
-                <Timer
+                <Countdown
                   initialSeconds={-120}
                   size="md"
                   overtimeMessage="Overtime!"

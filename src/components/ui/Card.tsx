@@ -1,17 +1,14 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-interface CardTitleProps extends React.HTMLAttributes<HTMLHeadingElement> {}
-
-interface CardDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
-
-interface CardContentProps extends React.HTMLAttributes<HTMLDivElement> {}
-
-interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+type CardProps = React.HTMLAttributes<HTMLDivElement>;
+type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
+type CardDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
+type CardContentProps = React.HTMLAttributes<HTMLDivElement>;
+type CardFooterProps = React.HTMLAttributes<HTMLDivElement>;
+type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
+  as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+};
 
 /**
  * Card - A flexible card container component
@@ -47,21 +44,16 @@ CardHeader.displayName = "CardHeader";
 /**
  * CardTitle - Title heading for a card
  */
+
 export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
-  ({ className, children, ...props }, ref) => (
-    <div className="text-center">
-      <h2
-        ref={ref}
-        className={cn("text-2xl font-bold text-gray-900 mb-2", className)}
-        {...props}
-      >
-        {children}
-      </h2>
-      <div className="w-16 h-1 bg-red-600 rounded-full mx-auto" />
-    </div>
+  ({ className, as: Tag = "h2", ...props }, ref) => (
+    <Tag
+      ref={ref}
+      className={cn("text-2xl font-bold text-gray-900", className)}
+      {...props}
+    />
   )
 );
-CardTitle.displayName = "CardTitle";
 
 /**
  * CardDescription - Description text for a card

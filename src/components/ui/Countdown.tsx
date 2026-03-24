@@ -5,26 +5,26 @@ import { ClockIcon, AlertTriangleIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Visual variants for the timer based on remaining time.
+ * Visual variants for the Countdown based on remaining time.
  */
-export type TimerVariant = "success" | "warning" | "danger" | "overtime" | "neutral" | "default";
+export type CountdownVariant = "success" | "warning" | "danger" | "overtime" | "neutral" | "default";
 
 /**
- * Size presets for the timer.
+ * Size presets for the Countdown.
  */
-export type TimerSize = "sm" | "md" | "lg" | "xl";
+export type CountdownSize = "sm" | "md" | "lg" | "xl";
 
-export interface TimerProps {
+export interface CountdownProps {
   /** Initial time in seconds */
   initialSeconds: number;
-  /** Optional callback when timer reaches zero */
+  /** Optional callback when Countdown reaches zero */
   onTimeUp?: () => void;
   /** Optional callback on every tick */
   onTick?: (secondsLeft: number) => void;
-  /** The scale of the timer component */
-  size?: TimerSize;
+  /** The scale of the Countdown component */
+  size?: CountdownSize;
   /** Overrides the automatic color logic */
-  variant?: TimerVariant;
+  variant?: CountdownVariant;
   /** Optional descriptive label */
   label?: string;
   /** Custom message when time is up */
@@ -35,22 +35,22 @@ export interface TimerProps {
   showIcon?: boolean;
   /** Whether to show status messages */
   showStatusMessages?: boolean;
-  /** Whether timer should auto-start */
+  /** Whether Countdown should auto-start */
   autoStart?: boolean;
-  /** Whether timer is paused */
+  /** Whether Countdown is paused */
   isPaused?: boolean;
   /** Additional CSS classes */
   className?: string;
 }
 
-const sizeMap: Record<TimerSize, { text: string; icon: number; container: string }> = {
-  sm: { text: "text-2xl", icon: 4, container: "p-2" },
-  md: { text: "text-4xl", icon: 6, container: "p-4" },
-  lg: { text: "text-6xl", icon: 8, container: "p-6" },
-  xl: { text: "text-8xl", icon: 10, container: "p-8" },
+const sizeMap: Record<CountdownSize, { text: string; icon: number; container: string }> = {
+  sm: { text: "text-2xl", icon: 16, container: "p-2" },
+  md: { text: "text-4xl", icon: 24, container: "p-4" },
+  lg: { text: "text-6xl", icon: 32, container: "p-6" },
+  xl: { text: "text-8xl", icon: 40, container: "p-8" },
 };
 
-const variantMap: Record<TimerVariant, { text: string; bg: string; border: string }> = {
+const variantMap: Record<CountdownVariant, { text: string; bg: string; border: string }> = {
   success: { text: "text-green-600", bg: "bg-green-50", border: "border-green-200" },
   warning: { text: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200" },
   danger: { text: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
@@ -78,12 +78,12 @@ function formatTime(seconds: number): string {
 }
 
 /**
- * Timer
+ * Countdown
  * 
- * A flexible countdown timer component with automatic color transitions,
+ * A flexible countdown Countdown component with automatic color transitions,
  * pause/resume functionality, and customizable messages.
  */
-export function Timer({
+export function Countdown({
   initialSeconds,
   onTimeUp,
   onTick,
@@ -96,8 +96,8 @@ export function Timer({
   showStatusMessages = true,
   autoStart = true,
   isPaused = false,
-  className = "",
-}: TimerProps) {
+  className,
+}: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState(initialSeconds);
   const onTimeUpRef = useRef(onTimeUp);
   const onTickRef = useRef(onTick);
@@ -117,7 +117,7 @@ export function Timer({
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         const next = prev - 1;
-        if (next === 0) onTimeUpRef.current?.();
+        if (prev > 0 && next <= 0) onTimeUpRef.current?.();
         onTickRef.current?.(next);
         return next;
       });
@@ -126,7 +126,7 @@ export function Timer({
     return () => clearInterval(interval);
   }, [autoStart, isPaused]);
 
-  const variant: TimerVariant =
+  const variant: CountdownVariant =
     forcedVariant ||
     (timeLeft < 0
       ? "overtime"
@@ -139,6 +139,8 @@ export function Timer({
   const styles = variantMap[variant];
   const sizeConfig = sizeMap[size];
 
+  const isOvertimeOrWarning = timeLeft < 0 || timeLeft <= 60;
+
   return (
     <div
       className={cn(
@@ -148,15 +150,19 @@ export function Timer({
         sizeConfig.container,
         className
       )}
+      role="timer"
+      aria-label={label ? `${label}: ${formatTime(timeLeft)}` : `Countdown: ${formatTime(timeLeft)}`}
+      aria-live={isOvertimeOrWarning ? "polite" : "off"}
+      aria-atomic="true"
     >
       <div className="text-center flex flex-col items-center">
         <div className="flex items-center justify-center">
           {showIcon && (
             <>
               {timeLeft < 0 ? (
-                <AlertTriangleIcon className={cn("mr-3", styles.text)} size={sizeConfig.icon * 4} />
+                <AlertTriangleIcon className={cn("mr-3", styles.text)} size={sizeConfig.icon} />
               ) : (
-                <ClockIcon className={cn("mr-3", styles.text)} size={sizeConfig.icon * 4} />
+                <ClockIcon className={cn("mr-3", styles.text)} size={sizeConfig.icon} />
               )}
             </>
           )}
@@ -166,6 +172,7 @@ export function Timer({
               sizeConfig.text,
               styles.text
             )}
+            aria-label={`${formatTime(timeLeft)} remaining`}
           >
             {formatTime(timeLeft)}
           </span>
@@ -174,11 +181,11 @@ export function Timer({
         {showStatusMessages && (
           <div className="mt-2 min-h-6">
             {timeLeft < 0 ? (
-              <p className="text-sm font-bold uppercase tracking-widest text-purple-600 animate-pulse">
+              <p className={cn("text-sm font-bold uppercase tracking-widest animate-pulse", styles.text)}>
                 {overtimeMessage}
               </p>
             ) : timeLeft <= 60 ? (
-              <p className="text-sm font-bold uppercase tracking-widest text-red-600 animate-pulse">
+              <p className={cn("text-sm font-bold uppercase tracking-widest animate-pulse", styles.text)}>
                 {lastMinuteMessage}
               </p>
             ) : label ? (

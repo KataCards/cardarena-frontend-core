@@ -1,21 +1,10 @@
 import { cn } from "@/lib/utils";
+import { Button } from "./Button";
 
 interface ErrorAlertProps {
-  /**
-   * Error message to display
-   */
   message: string;
-  /**
-   * Optional retry callback
-   */
   onRetry?: () => void;
-  /**
-   * Text for the retry button
-   */
   retryText?: string;
-  /**
-   * Additional className for the container
-   */
   className?: string;
 }
 
@@ -31,7 +20,7 @@ interface ErrorAlertProps {
 export function ErrorAlert({
   message,
   onRetry,
-  retryText = "Erneut versuchen",
+  retryText = "Retry?",
   className,
 }: ErrorAlertProps) {
   return (
@@ -44,12 +33,14 @@ export function ErrorAlert({
     >
       <span>{message}</span>
       {onRetry && (
-        <button
+        <Button
+          variant="ghost"
+          colorScheme="red"
+          size="sm"
           onClick={onRetry}
-          className="ml-4 underline hover:no-underline font-medium transition-all"
         >
           {retryText}
-        </button>
+        </Button>
       )}
     </div>
   );
