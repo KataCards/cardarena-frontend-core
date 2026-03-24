@@ -1,5 +1,5 @@
 // components/composed/Features.tsx
-import { FeatureCard } from "@/components/ui/FeatureCard";
+import { FeatureCard } from "@/components/composed/display/FeatureCard";
 import { ReactNode } from "react";
 
 export interface Feature {

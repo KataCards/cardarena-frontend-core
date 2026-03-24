@@ -1,4 +1,4 @@
-import { MatchCard } from "@/components/ui/MatchCard";
+import { MatchCard } from "@/components/composed/display/MatchCard";
 import type { BracketMatch } from "@/types/ui/bracket";
 
 /**

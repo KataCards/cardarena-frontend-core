@@ -1,5 +1,5 @@
 // components/composed/Testimonials.tsx
-import { TestimonialCard } from "@/components/ui/TestimonialCard";
+import { TestimonialCard } from "@/components/composed/display/TestimonialCard";
 
 export interface Testimonial {
   name: string;

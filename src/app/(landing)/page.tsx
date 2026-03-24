@@ -23,12 +23,12 @@ import { QRRegistrationBanner } from "@/components/composed/WIP_QRRegistrationBa
 
 // UI Components
 import { Button } from "@/components/ui/Button";
-import { FeatureCard } from "@/components/ui/FeatureCard";
-import { StatCard } from "@/components/ui/StatCard";
-import { TestimonialCard } from "@/components/ui/TestimonialCard";
-import { PricingCard } from "@/components/ui/PricingCard";
-import { TournamentCard } from "@/components/ui/TournamentCard";
-import { MatchCard } from "@/components/ui/MatchCard";
+import { FeatureCard } from "@/components/composed/display/FeatureCard";
+import { StatCard } from "@/components/composed/display/StatCard";
+import { TestimonialCard } from "@/components/composed/display/TestimonialCard";
+import { PricingCard } from "@/components/composed/display/PricingCard";
+import { TournamentCard } from "@/components/composed/display/TournamentCard";
+import { MatchCard } from "@/components/composed/display/MatchCard";
 import { Timer } from "@/components/ui/Timer";
 
 /**

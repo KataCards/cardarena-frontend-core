@@ -1,5 +1,5 @@
 // components/composed/Pricing.tsx
-import { PricingCard } from "@/components/ui/PricingCard";
+import { PricingCard } from "@/components/composed/display/PricingCard";
 
 export interface PricingPlan {
   name: string;

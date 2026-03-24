@@ -1,4 +1,4 @@
-import { PlayerFormField } from "./player-form-field";
+import { PlayerFormField } from "./PlayerFormField";
 
 interface PlayerFormData {
   username: string;

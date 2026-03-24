@@ -1,143 +1,143 @@
 "use client";
-import { useState, useEffect } from "react";
-import { Clock, AlertTriangle } from "lucide-react";
+
+import { useState, useEffect, useRef } from "react";
+import { ClockIcon, AlertTriangleIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export interface CountdownProps {
+/**
+ * Visual variants for the timer based on remaining time.
+ */
+export type TimerVariant = "success" | "warning" | "danger" | "overtime" | "neutral" | "default";
+
+/**
+ * Size presets for the timer.
+ */
+export type TimerSize = "sm" | "md" | "lg" | "xl";
+
+export interface TimerProps {
   /** Initial time in seconds */
-  initialTime: number;
-  /** Callback when countdown reaches zero */
-  onComplete?: () => void;
-  /** Callback on every tick (second) */
-  onTick?: (timeLeft: number) => void;
-  /** Show icon */
-  showIcon?: boolean;
-  /** Optional label text */
+  initialSeconds: number;
+  /** Optional callback when timer reaches zero */
+  onTimeUp?: () => void;
+  /** Optional callback on every tick */
+  onTick?: (secondsLeft: number) => void;
+  /** The scale of the timer component */
+  size?: TimerSize;
+  /** Overrides the automatic color logic */
+  variant?: TimerVariant;
+  /** Optional descriptive label */
   label?: string;
-  /** Size variant */
-  size?: "sm" | "md" | "lg" | "xl";
-  /** Color variant */
-  variant?: "default" | "danger" | "warning" | "success";
-  /** Show status messages */
-  showStatusMessages?: boolean;
   /** Custom message when time is up */
   overtimeMessage?: string;
-  /** Custom message for last minute */
+  /** Custom message for last minute warning */
   lastMinuteMessage?: string;
+  /** Whether to show icon */
+  showIcon?: boolean;
+  /** Whether to show status messages */
+  showStatusMessages?: boolean;
+  /** Whether timer should auto-start */
+  autoStart?: boolean;
+  /** Whether timer is paused */
+  isPaused?: boolean;
   /** Additional CSS classes */
   className?: string;
 }
 
-const sizeConfig = {
-  sm: { container: "p-3", text: "text-2xl", icon: 4 },
-  md: { container: "p-4", text: "text-4xl", icon: 6 },
-  lg: { container: "p-6", text: "text-6xl", icon: 8 },
-  xl: { container: "p-8", text: "text-8xl", icon: 10 },
+const sizeMap: Record<TimerSize, { text: string; icon: number; container: string }> = {
+  sm: { text: "text-2xl", icon: 4, container: "p-2" },
+  md: { text: "text-4xl", icon: 6, container: "p-4" },
+  lg: { text: "text-6xl", icon: 8, container: "p-6" },
+  xl: { text: "text-8xl", icon: 10, container: "p-8" },
 };
 
-const variantStyles = {
-  default: {
-    bg: "bg-white",
-    border: "border-gray-200",
-    text: "text-gray-900",
-  },
-  danger: {
-    bg: "bg-red-50",
-    border: "border-red-200",
-    text: "text-red-600",
-  },
-  warning: {
-    bg: "bg-yellow-50",
-    border: "border-yellow-200",
-    text: "text-yellow-600",
-  },
-  success: {
-    bg: "bg-green-50",
-    border: "border-green-200",
-    text: "text-green-600",
-  },
+const variantMap: Record<TimerVariant, { text: string; bg: string; border: string }> = {
+  success: { text: "text-green-600", bg: "bg-green-50", border: "border-green-200" },
+  warning: { text: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200" },
+  danger: { text: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
+  overtime: { text: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200" },
+  neutral: { text: "text-gray-600", bg: "bg-gray-50", border: "border-gray-200" },
+  default: { text: "text-gray-900", bg: "bg-white", border: "border-gray-200" },
 };
 
 /**
- * Countdown Component
- * 
- * A versatile countdown timer with multiple size and color variants,
- * status messages, and callbacks for completion and ticks.
- * 
- * @example
- * // Basic usage
- * <Countdown initialTime={300} />
- * 
- * @example
- * // With callbacks and custom messages
- * <Countdown 
- *   initialTime={60}
- *   onComplete={() => alert('Time is up!')}
- *   onTick={(time) => console.log(time)}
- *   showStatusMessages
- *   overtimeMessage="OVERTIME!"
- *   lastMinuteMessage="HURRY UP!"
- * />
- * 
- * @example
- * // Large danger variant
- * <Countdown 
- *   initialTime={120}
- *   size="lg"
- *   variant="danger"
- *   label="Time Remaining"
- * />
+ * Format seconds into a MM:SS or HH:MM:SS string.
  */
-export function Countdown({
-  initialTime,
-  onComplete,
+function formatTime(seconds: number): string {
+  const abs = Math.abs(seconds);
+  const hours = Math.floor(abs / 3600);
+  const mins = Math.floor((abs % 3600) / 60);
+  const secs = abs % 60;
+  
+  const prefix = seconds < 0 ? '-\u200A' : '';
+  
+  if (hours > 0) {
+    return `${prefix}${hours}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+  
+  return `${prefix}${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Timer
+ * 
+ * A flexible countdown timer component with automatic color transitions,
+ * pause/resume functionality, and customizable messages.
+ */
+export function Timer({
+  initialSeconds,
+  onTimeUp,
   onTick,
-  showIcon = true,
-  label,
   size = "md",
-  variant = "default",
+  variant: forcedVariant,
+  label,
+  overtimeMessage = "Overtime!",
+  lastMinuteMessage = "Last Minute!",
+  showIcon = true,
   showStatusMessages = true,
-  overtimeMessage = "TIME'S UP!",
-  lastMinuteMessage = "FINAL MINUTE!",
-  className,
-}: CountdownProps) {
-  const [timeLeft, setTimeLeft] = useState(initialTime);
+  autoStart = true,
+  isPaused = false,
+  className = "",
+}: TimerProps) {
+  const [timeLeft, setTimeLeft] = useState(initialSeconds);
+  const onTimeUpRef = useRef(onTimeUp);
+  const onTickRef = useRef(onTick);
 
   useEffect(() => {
-    setTimeLeft(initialTime);
-  }, [initialTime]);
+    onTimeUpRef.current = onTimeUp;
+    onTickRef.current = onTick;
+  }, [onTimeUp, onTick]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    setTimeLeft(initialSeconds);
+  }, [initialSeconds]);
+
+  useEffect(() => {
+    if (!autoStart || isPaused) return;
+
+    const interval = setInterval(() => {
       setTimeLeft((prev) => {
-        const newTime = prev - 1;
-        onTick?.(newTime);
-        
-        if (newTime === 0) {
-          onComplete?.();
-        }
-        
-        return newTime;
+        const next = prev - 1;
+        if (next === 0) onTimeUpRef.current?.();
+        onTickRef.current?.(next);
+        return next;
       });
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, [onComplete, onTick]);
+    return () => clearInterval(interval);
+  }, [autoStart, isPaused]);
 
-  const formatTime = (seconds: number): string => {
-    const absSeconds = Math.abs(seconds);
-    const hours = Math.floor(absSeconds / 3600);
-    const minutes = Math.floor((absSeconds % 3600) / 60);
-    const secs = absSeconds % 60;
+  const variant: TimerVariant =
+    forcedVariant ||
+    (timeLeft < 0
+      ? "overtime"
+      : timeLeft <= 60
+        ? "danger"
+        : timeLeft <= 300
+          ? "warning"
+          : "success");
 
-    if (hours > 0) {
-      return `${seconds < 0 ? "-" : ""}${hours}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-    }
-    return `${seconds < 0 ? "-" : ""}${minutes}:${String(secs).padStart(2, "0")}`;
-  };
-
-  const styles = variantStyles[variant];
-  const config = sizeConfig[size];
+  const styles = variantMap[variant];
+  const sizeConfig = sizeMap[size];
 
   return (
     <div
@@ -145,7 +145,7 @@ export function Countdown({
         "rounded-2xl border transition-all duration-500 shadow-sm",
         styles.bg,
         styles.border,
-        config.container,
+        sizeConfig.container,
         className
       )}
     >
@@ -154,16 +154,16 @@ export function Countdown({
           {showIcon && (
             <>
               {timeLeft < 0 ? (
-                <AlertTriangle className={cn("mr-3", styles.text)} size={config.icon * 4} />
+                <AlertTriangleIcon className={cn("mr-3", styles.text)} size={sizeConfig.icon * 4} />
               ) : (
-                <Clock className={cn("mr-3", styles.text)} size={config.icon * 4} />
+                <ClockIcon className={cn("mr-3", styles.text)} size={sizeConfig.icon * 4} />
               )}
             </>
           )}
           <span
             className={cn(
               "font-bold tabular-nums leading-none",
-              config.text,
+              sizeConfig.text,
               styles.text
             )}
           >
@@ -171,7 +171,6 @@ export function Countdown({
           </span>
         </div>
 
-        {/* Dynamic Status Messages */}
         {showStatusMessages && (
           <div className="mt-2 min-h-6">
             {timeLeft < 0 ? (
