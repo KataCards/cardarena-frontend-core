@@ -12,13 +12,25 @@ type CardTitleProps = React.HTMLAttributes<HTMLHeadingElement> & {
 
 /**
  * Card - A flexible card container component
+ *
+ * Uses semantic theme tokens for consistent theming.
+ *
+ * @example
+ * <Card>
+ *   <CardHeader>
+ *     <CardTitle>Card Title</CardTitle>
+ *     <CardDescription>Card description</CardDescription>
+ *   </CardHeader>
+ *   <CardContent>Content goes here</CardContent>
+ *   <CardFooter>Footer content</CardFooter>
+ * </Card>
  */
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        "bg-white rounded-2xl shadow-xl border border-gray-100",
+        "bg-card text-card-foreground rounded-2xl shadow-xl border border-border",
         className
       )}
       {...props}
@@ -43,20 +55,31 @@ CardHeader.displayName = "CardHeader";
 
 /**
  * CardTitle - Title heading for a card
+ *
+ * @example
+ * <CardTitle>My Card Title</CardTitle>
+ *
+ * @example
+ * <CardTitle as="h3">Smaller Heading</CardTitle>
  */
-
 export const CardTitle = React.forwardRef<HTMLHeadingElement, CardTitleProps>(
   ({ className, as: Tag = "h2", ...props }, ref) => (
     <Tag
       ref={ref}
-      className={cn("text-2xl font-bold text-gray-900", className)}
+      className={cn("text-2xl font-bold text-card-foreground", className)}
       {...props}
     />
   )
 );
+CardTitle.displayName = "CardTitle";
 
 /**
  * CardDescription - Description text for a card
+ *
+ * @example
+ * <CardDescription>
+ *   This is a description of the card content.
+ * </CardDescription>
  */
 export const CardDescription = React.forwardRef<
   HTMLParagraphElement,
@@ -64,7 +87,7 @@ export const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-gray-600", className)}
+    className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
 ));

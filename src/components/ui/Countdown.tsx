@@ -51,12 +51,12 @@ const sizeMap: Record<CountdownSize, { text: string; icon: number; container: st
 };
 
 const variantMap: Record<CountdownVariant, { text: string; bg: string; border: string }> = {
-  success: { text: "text-green-600", bg: "bg-green-50", border: "border-green-200" },
-  warning: { text: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200" },
-  danger: { text: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
-  overtime: { text: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200" },
-  neutral: { text: "text-gray-600", bg: "bg-gray-50", border: "border-gray-200" },
-  default: { text: "text-gray-900", bg: "bg-white", border: "border-gray-200" },
+  success: { text: "text-success", bg: "bg-success/10", border: "border-success/20" },
+  warning: { text: "text-warning", bg: "bg-warning/10", border: "border-warning/20" },
+  danger: { text: "text-destructive", bg: "bg-destructive/10", border: "border-destructive/20" },
+  overtime: { text: "text-info", bg: "bg-info/10", border: "border-info/20" },
+  neutral: { text: "text-muted-foreground", bg: "bg-muted", border: "border-border" },
+  default: { text: "text-foreground", bg: "bg-background", border: "border-border" },
 };
 
 /**
@@ -189,7 +189,7 @@ export function Countdown({
                 {lastMinuteMessage}
               </p>
             ) : label ? (
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-widest">{label}</p>
+              <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest">{label}</p>
             ) : null}
           </div>
         )}

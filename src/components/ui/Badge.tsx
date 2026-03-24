@@ -1,37 +1,45 @@
-import { ReactNode, HTMLAttributes } from "react";
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
  * Props for the Badge component
  */
-export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Content to display inside the badge */
-  children: ReactNode;
+  children: React.ReactNode;
   /** Visual variant - determines color scheme. @default "default" */
-  variant?: "default" | "success" | "warning" | "error" | "info" | "neutral";
+  variant?: "default" | "secondary" | "success" | "warning" | "destructive" | "info" | "outline";
   /** Badge size. @default "md" */
   size?: "sm" | "md" | "lg";
   /** Optional icon component to display before text. Should accept className and size props. */
   icon?: React.ComponentType<{ className?: string; size?: number }>;
-  /** Additional CSS classes to merge with defaults */
-  className?: string;
 }
 
+/**
+ * Semantic variant styles using theme tokens
+ */
 const variantStyles = {
-  default: "bg-gray-100 text-gray-800 border-gray-200",
-  success: "bg-green-100 text-green-800 border-green-200",
-  warning: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  error: "bg-red-100 text-red-800 border-red-200",
-  info: "bg-blue-100 text-blue-800 border-blue-200",
-  neutral: "bg-gray-50 text-gray-600 border-gray-100",
+  default: "bg-primary text-primary-foreground border-primary",
+  secondary: "bg-secondary text-secondary-foreground border-secondary",
+  success: "bg-success text-success-foreground border-success",
+  warning: "bg-warning text-warning-foreground border-warning",
+  destructive: "bg-destructive text-destructive-foreground border-destructive",
+  info: "bg-info text-info-foreground border-info",
+  outline: "bg-background text-foreground border-border",
 };
 
+/**
+ * Size styles
+ */
 const sizeStyles = {
   sm: "text-xs px-2 py-0.5",
   md: "text-sm px-2.5 py-0.5",
   lg: "text-base px-3 py-1",
 };
 
+/**
+ * Icon size mapping
+ */
 const iconSizeMap = {
   sm: 12,
   md: 14,
@@ -41,10 +49,25 @@ const iconSizeMap = {
 /**
  * Badge Component
  *
- * A compact, versatile badge for displaying status, labels, counts, or tags.
- * Supports 6 semantic variants, 3 sizes, optional icons, and full className customization.
+ * A compact, accessible badge for displaying status, labels, counts, or tags.
+ * Uses semantic theme tokens for consistent theming across light/dark modes.
+ *
+ * Features:
+ * - 7 semantic variants (default, secondary, success, warning, destructive, info, outline)
+ * - 3 sizes (sm, md, lg)
+ * - Optional icon support
+ * - ForwardRef support
+ * - Semantic color tokens (no hardcoded colors)
+ * - Full className customization
+ *
+ * Design Philosophy:
+ * - Uses semantic theme tokens for all colors
+ * - Accessible by default
+ * - Icon support with proper ARIA attributes
+ * - Flexible sizing and styling
  *
  * @param props - Badge configuration
+ * @param ref - Forwarded ref to the span element
  * @returns The rendered badge element
  *
  * @example
@@ -52,8 +75,10 @@ const iconSizeMap = {
  * <Badge>New</Badge>
  *
  * @example
- * // With variant and size
- * <Badge variant="success" size="lg">Active</Badge>
+ * // Status badges
+ * <Badge variant="success">Active</Badge>
+ * <Badge variant="warning">Pending</Badge>
+ * <Badge variant="destructive">Error</Badge>
  *
  * @example
  * // With icon
@@ -61,35 +86,49 @@ const iconSizeMap = {
  * <Badge variant="success" icon={CheckCircle}>Completed</Badge>
  *
  * @example
- * // Custom styling
- * <Badge className="bg-purple-100 text-purple-800">Custom</Badge>
+ * // Different sizes
+ * <Badge size="sm">Small</Badge>
+ * <Badge size="md">Medium</Badge>
+ * <Badge size="lg">Large</Badge>
+ *
+ * @example
+ * // Outline variant
+ * <Badge variant="outline">Neutral</Badge>
  */
-export function Badge({
-  children,
-  variant = "default",
-  size = "md",
-  icon: Icon,
-  className,
-  ...rest
-}: BadgeProps) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 font-medium rounded-full border",
-        variantStyles[variant],
-        sizeStyles[size],
-        className
-      )}
-      {...rest}
-    >
-      {Icon && (
-        <Icon
-          className="shrink-0"
-          size={iconSizeMap[size]}
-          aria-hidden="true"
-        />
-      )}
-      {children}
-    </span>
-  );
-}
+export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
+  (
+    {
+      children,
+      variant = "default",
+      size = "md",
+      icon: Icon,
+      className,
+      ...rest
+    },
+    ref
+  ) => {
+    return (
+      <span
+        ref={ref}
+        className={cn(
+          "inline-flex items-center gap-1 font-medium rounded-full border",
+          variantStyles[variant],
+          sizeStyles[size],
+          className
+        )}
+        {...rest}
+      >
+        {Icon && (
+          <Icon
+            className="shrink-0"
+            size={iconSizeMap[size]}
+            aria-hidden="true"
+          />
+        )}
+        {children}
+      </span>
+    );
+  }
+);
+
+Badge.displayName = "Badge";

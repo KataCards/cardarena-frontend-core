@@ -33,9 +33,9 @@ const sizeStyles: Record<CheckboxSize, { box: string; icon: string; label: strin
 };
 
 const colorStyles: Record<CheckboxColorScheme, { checked: string; focus: string }> = {
-  red: { checked: "bg-red-600 border-red-600", focus: "focus-visible:ring-red-500" },
-  dark: { checked: "bg-gray-900 border-gray-900", focus: "focus-visible:ring-gray-700" },
-  gray: { checked: "bg-gray-500 border-gray-500", focus: "focus-visible:ring-gray-400" },
+  red: { checked: "bg-primary border-primary", focus: "focus-visible:ring-ring" },
+  dark: { checked: "bg-foreground border-foreground", focus: "focus-visible:ring-ring" },
+  gray: { checked: "bg-muted-foreground border-muted-foreground", focus: "focus-visible:ring-ring" },
 };
 
 /** Checkmark SVG */
@@ -161,7 +161,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
               sz.box,
               isActive
                 ? color.checked
-                : "border-gray-300 bg-white hover:border-gray-400",
+                : "border-input bg-background hover:border-muted-foreground",
               disabled && "opacity-50",
               // Focus ring follows the native input focus, proxied via peer
               "peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2",
@@ -184,7 +184,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
               <label
                 htmlFor={id}
                 className={cn(
-                  "font-medium text-gray-900 leading-snug select-none",
+                  "font-medium text-foreground leading-snug select-none",
                   sz.label,
                   disabled && "opacity-50 cursor-not-allowed"
                 )}
@@ -195,7 +195,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             {description && (
               <p
                 id={descriptionId}
-                className={cn("text-gray-500 leading-snug", sz.description)}
+                className={cn("text-muted-foreground leading-snug", sz.description)}
               >
                 {description}
               </p>

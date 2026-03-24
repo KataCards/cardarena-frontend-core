@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { 
   Trophy, Users, Zap, Shield, Rocket, Target, Clock, DollarSign, 
   TrendingUp, MapPin, Calendar, Gamepad2, Settings,
-  CheckCircle, Code, Star
+  CheckCircle, Code, Star, Mail, Search, Info, AlertTriangle
 } from "lucide-react";
 
 // Layout Components
@@ -13,23 +14,25 @@ import { Footer } from "@/components/layout/Footer";
 // Composed Components
 import { Hero } from "@/components/composed/Hero";
 import { Features } from "@/components/composed/Features";
-import { Stats } from "@/components/composed/Stats";
-import { Testimonials } from "@/components/composed/Testimonials";
-import { Pricing } from "@/components/composed/Pricing";
 import { CTA } from "@/components/composed/CTA";
-import { TabSection } from "@/components/composed/TabSection";
-import { StatusBanner } from "@/components/composed/StatusBanner";
-import { QRRegistrationBanner } from "@/components/composed/WIP_QRRegistrationBanner";
 
 // UI Components
 import { Button } from "@/components/ui/Button";
-import { FeatureCard } from "@/components/composed/display/FeatureCard";
-import { StatCard } from "@/components/composed/display/StatCard";
-import { TestimonialCard } from "@/components/composed/display/TestimonialCard";
-import { PricingCard } from "@/components/composed/display/PricingCard";
-import { TournamentCard } from "@/components/composed/display/TournamentCard";
-import { MatchCard } from "@/components/composed/display/MatchCard";
+import { Badge } from "@/components/ui/Badge";
 import { Countdown } from "@/components/ui/Countdown";
+import { Accordion } from "@/components/ui/Accordion";
+import { 
+  TableContainer, Table, TableHeader, TableBody, TableRow, TableHead, TableCell 
+} from "@/components/ui/Table";
+import { Slider } from "@/components/ui/Slider";
+import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
+import { SearchInput } from "@/components/ui/SearchInput";
+import { Label } from "@/components/ui/Label";
+import { FieldError } from "@/components/ui/FieldError";
+import { WinnerModal } from "@/components/ui/WinnerModal";
+import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 /**
  * Component Reference Gallery
@@ -39,8 +42,27 @@ import { Countdown } from "@/components/ui/Countdown";
  * its purpose, variants, and key features.
  */
 export default function ComponentGallery() {
+  const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
+  const [sliderValue, setSliderValue] = useState(50);
+  const [accordionExpanded, setAccordionExpanded] = useState<Set<string>>(new Set(["1"]));
+
+  const handleAccordionToggle = (id: string) => {
+    setAccordionExpanded(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const tableData = [
+    { id: 1, name: "Alice Johnson", role: "Organizer", status: "Active" },
+    { id: 2, name: "Bob Smith", role: "Player", status: "Inactive" },
+    { id: 3, name: "Charlie Brown", role: "Admin", status: "Active" },
+  ];
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* ========================================
           LAYOUT COMPONENTS
       ======================================== */}
@@ -59,7 +81,7 @@ export default function ComponentGallery() {
           { label: "Pricing", href: "#pricing" },
           { label: "Contact", href: "#contact" }
         ]}
-        action={{ label: "Get Started", href: "/signup", colorScheme: "red" }}
+        action={{ label: "Get Started", href: "/signup" }}
         variant="white"
         sticky={true}
       />
@@ -71,296 +93,210 @@ export default function ComponentGallery() {
         
         {/* Hero - With Badge & Secondary Action */}
         <Hero
-          badge="🎉 v1.0 Now Available"
+          badge="🎉 v0.2.0 Now Available"
           title={
             <>
-              Build <span className="text-red-600">tournament platforms</span> that players love
+              Build <span className="text-primary">tournament platforms</span> that players love
             </>
           }
-          description="A complete library of production-ready React components for card game tournaments, event management, and competitive gaming platforms."
+          description="A complete library of production-grade React components for card game tournaments, event management, and competitive gaming platforms."
           primaryText="Explore Components"
           primaryHref="#components"
           secondaryText="View on GitHub"
           secondaryHref="https://github.com"
         />
 
-        {/* Hero - Primary Action Only */}
-        <section className="py-12 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Hero Variants</h2>
-            <div className="bg-white p-8 rounded-xl shadow-sm">
-              <Hero
-                title="Simple & Focused"
-                description="Sometimes less is more. This hero variant focuses on a single, powerful call-to-action."
-                primaryText="Start Free Trial"
-                primaryHref="/signup"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================
-            STATS SECTION
-        ======================================== */}
-        
-        {/* Stats - 4 Columns with Icons */}
-        <Stats
-          title="Platform Statistics"
-          description="Trusted by thousands of organizers worldwide"
-          columns={4}
-          stats={[
-            { value: "10K+", label: "Active Users", icon: Users, variant: "primary" },
-            { value: "500+", label: "Tournaments", icon: Trophy, variant: "success" },
-            { value: "99.9%", label: "Uptime", icon: Zap, variant: "info" },
-            { value: "24/7", label: "Support", icon: Clock }
-          ]}
-        />
-
-        {/* Stats - 3 Columns Dark Variant */}
-        <Stats
-          variant="dark"
-          columns={3}
-          stats={[
-            { value: "$2.5M+", label: "Prize Pool Distributed", icon: DollarSign },
-            { value: "150+", label: "Countries", icon: MapPin },
-            { value: "4.9/5", label: "User Rating", icon: Star }
-          ]}
-        />
-
-        {/* ========================================
-            FEATURES SECTION
-        ======================================== */}
-        
-        {/* Features - Light Variant */}
-        <Features
-          title="Everything you need"
-          description="Professional tools for perfect tournaments"
-          variant="light"
-          features={[
-            {
-              icon: <Zap className="w-8 h-8" />,
-              title: "Lightning Fast",
-              description: "Built with React 19 Server Components for maximum performance and instant page loads."
-            },
-            {
-              icon: <Shield className="w-8 h-8" />,
-              title: "Secure & Reliable",
-              description: "Type-safe APIs and validated data processing ensure your tournaments run smoothly."
-            },
-            {
-              icon: <Rocket className="w-8 h-8" />,
-              title: "Scalable Architecture",
-              description: "Modular components based on Atomic Design principles that grow with your needs."
-            },
-            {
-              icon: <Target className="w-8 h-8" />,
-              title: "Tournament Ready",
-              description: "Pre-built components for brackets, matches, timers, and player management."
-            },
-            {
-              icon: <Users className="w-8 h-8" />,
-              title: "Player Management",
-              description: "Comprehensive tools for registration, rankings, and player profiles."
-            },
-            {
-              icon: <Trophy className="w-8 h-8" />,
-              title: "Real-time Updates",
-              description: "Live match results, bracket updates, and instant notifications for participants."
-            }
-          ]}
-        />
-
-        {/* Features - Dark Variant */}
-        <Features
-          title="Why Choose CardArena?"
-          description="Built by tournament organizers, for tournament organizers"
-          variant="dark"
-          features={[
-            {
-              icon: <CheckCircle className="w-8 h-8" />,
-              title: "Battle-Tested",
-              description: "Used in over 500 professional tournaments with 10,000+ active users."
-            },
-            {
-              icon: <Zap className="w-8 h-8" />,
-              title: "Open Source",
-              description: "100% open source and free to use. Contribute and customize as needed."
-            },
-            {
-              icon: <Shield className="w-8 h-8" />,
-              title: "TypeScript First",
-              description: "Full type safety and IntelliSense support for better developer experience."
-            }
-          ]}
-        />
-
         {/* ========================================
             UI COMPONENTS SHOWCASE
         ======================================== */}
         
-        <section id="components" className="py-20 bg-white">
+        <section id="components" className="py-20 bg-background border-t border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">UI Components</h2>
-              <p className="text-xl text-gray-600">Flexible, reusable building blocks</p>
+              <h2 className="text-4xl font-bold text-foreground mb-4">UI Components</h2>
+              <p className="text-xl text-muted-foreground">Flexible, reusable building blocks</p>
             </div>
 
-            {/* Buttons */}
-            <div className="mb-16">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Buttons</h3>
-              <div className="flex flex-wrap gap-4">
-                <Button variant="solid" colorScheme="red">Solid Red</Button>
-                <Button variant="solid" colorScheme="dark">Solid Dark</Button>
-                <Button variant="secondary" colorScheme="red">Secondary Red</Button>
-                <Button variant="outline" colorScheme="dark">Outline Dark</Button>
-                <Button variant="ghost" colorScheme="gray">Ghost Gray</Button>
-                <Button variant="solid" colorScheme="red" size="lg" icon={Rocket} iconPosition="right">
-                  Get Started
-                </Button>
-                <Button variant="outline" colorScheme="dark" icon={Code}>
-                  View on GitHub
-                </Button>
+            {/* Buttons & Badges */}
+            <div className="mb-20">
+              <h3 className="text-2xl font-bold text-foreground mb-6">Buttons & Badges</h3>
+              <div className="space-y-8">
+                <div className="flex flex-wrap gap-4 items-center">
+                  <Button variant="default">Default</Button>
+                  <Button variant="secondary">Secondary</Button>
+                  <Button variant="outline">Outline</Button>
+                  <Button variant="ghost">Ghost</Button>
+                  <Button variant="destructive">Destructive</Button>
+                  <Button variant="default" size="lg" icon={Rocket} iconPosition="right">
+                    Get Started
+                  </Button>
+                </div>
+                <div className="flex flex-wrap gap-4 items-center">
+                  <Badge variant="default">Default</Badge>
+                  <Badge variant="secondary">Secondary</Badge>
+                  <Badge variant="success">Success</Badge>
+                  <Badge variant="warning">Warning</Badge>
+                  <Badge variant="destructive">Destructive</Badge>
+                  <Badge variant="info">Info</Badge>
+                  <Badge variant="outline">Outline</Badge>
+                </div>
               </div>
             </div>
 
-            {/* Feature Cards */}
-            <div className="mb-16">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Feature Cards</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <FeatureCard
-                  icon={<Zap className="w-8 h-8" />}
-                  title="Lightning Fast"
-                  description="Optimized for performance with React Server Components"
-                  iconColor="red"
-                  variant="white"
-                />
-                <FeatureCard
-                  icon={<Shield className="w-8 h-8" />}
-                  title="Secure"
-                  description="Bank-level security with type-safe APIs"
-                  iconColor="blue"
-                  variant="gray"
-                />
-                <FeatureCard
-                  icon={<Rocket className="w-8 h-8" />}
-                  title="Scalable"
-                  description="Grows with your business from day one"
-                  iconColor="purple"
-                  variant="gradient"
-                />
+            {/* Inputs */}
+            <div className="mb-20">
+              <h3 className="text-2xl font-bold text-foreground mb-6">Forms & Inputs</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="email" required>Email Address</Label>
+                    <Input id="email" type="email" placeholder="you@example.com" leftSlot={<Mail className="w-4 h-4 text-muted-foreground" />} />
+                  </div>
+                  <div>
+                    <Label htmlFor="search">Search</Label>
+                    <SearchInput id="search" placeholder="Search tournaments..." />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="password">Password</Label>
+                    <PasswordInput id="password" placeholder="Enter your password" />
+                  </div>
+                  <div>
+                    <Label htmlFor="error-input">Input with Error</Label>
+                    <Input id="error-input" placeholder="Invalid value" className="border-destructive" aria-invalid="true" />
+                    <FieldError>This field is required.</FieldError>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Stat Cards */}
-            <div className="mb-16">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Stat Cards</h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <StatCard
-                  title="Total Users"
-                  value="12,345"
-                  icon={Users}
-                  iconColor="red"
-                  variant="gray"
-                />
-                <StatCard
-                  title="Revenue"
-                  value="$45,231"
-                  icon={DollarSign}
-                  iconColor="green"
-                  variant="white"
-                  trend={{ value: 12.5, label: "vs last month" }}
-                />
-                <StatCard
-                  title="Active Sessions"
-                  value={892}
-                  icon={TrendingUp}
-                  iconColor="blue"
-                  variant="gradient"
-                  trend={{ value: -3.2, label: "vs yesterday" }}
-                />
-                <StatCard
-                  title="Loading..."
-                  value="0"
-                  icon={Clock}
-                  iconColor="gray"
-                  isLoading={true}
-                />
+            {/* Table */}
+            <div className="mb-20">
+              <h3 className="text-2xl font-bold text-foreground mb-6">Data Table</h3>
+              <TableContainer>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead align="right">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tableData.map((row) => (
+                      <TableRow key={row.id}>
+                        <TableCell className="font-medium">{row.name}</TableCell>
+                        <TableCell>{row.role}</TableCell>
+                        <TableCell align="right">
+                          <Badge variant={row.status === "Active" ? "success" : "secondary"}>
+                            {row.status}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </div>
+
+            {/* Accordion & Slider */}
+            <div className="mb-20 grid grid-cols-1 lg:grid-cols-2 gap-12">
+              <div>
+                <h3 className="text-2xl font-bold text-foreground mb-6">Accordion</h3>
+                <Accordion.Root>
+                  <Accordion.Item id="1" isExpanded={accordionExpanded.has("1")} onToggle={handleAccordionToggle}>
+                    <Accordion.Header id="1" isExpanded={accordionExpanded.has("1")} onToggle={handleAccordionToggle}>
+                      What is CardArena?
+                    </Accordion.Header>
+                    <Accordion.Content id="1" isExpanded={accordionExpanded.has("1")}>
+                      CardArena is a professional tournament management platform for card games.
+                    </Accordion.Content>
+                  </Accordion.Item>
+                  <Accordion.Item id="2" isExpanded={accordionExpanded.has("2")} onToggle={handleAccordionToggle}>
+                    <Accordion.Header id="2" isExpanded={accordionExpanded.has("2")} onToggle={handleAccordionToggle}>
+                      Is it open source?
+                    </Accordion.Header>
+                    <Accordion.Content id="2" isExpanded={accordionExpanded.has("2")}>
+                      Yes! CardArena is built as an open-source core library for developers.
+                    </Accordion.Content>
+                  </Accordion.Item>
+                </Accordion.Root>
+              </div>
+              <div>
+                <h3 className="text-2xl font-bold text-foreground mb-6">Slider</h3>
+                <div className="space-y-8">
+                  <Slider.Root value={sliderValue} onChange={setSliderValue} min={0} max={100} size="md">
+                    <div className="flex justify-between items-center mb-2">
+                      <Label className="mb-0">Volume Control</Label>
+                      <Slider.Value format={(v) => `${v}%`} />
+                    </div>
+                    <Slider.Track>
+                      <Slider.Range />
+                      <Slider.Thumb />
+                    </Slider.Track>
+                    <Slider.RangeLabels />
+                  </Slider.Root>
+
+                  <Slider.Root value={25} onChange={() => {}} size="lg">
+                    <Slider.Track>
+                      <Slider.Range className="bg-success" />
+                      <Slider.Thumb className="[&::-webkit-slider-thumb]:border-success" />
+                    </Slider.Track>
+                  </Slider.Root>
+                </div>
               </div>
             </div>
 
-            {/* Tournament Cards */}
-            <div className="mb-16">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Tournament Cards</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <TournamentCard
-                  title="Summer Championship 2024"
-                  badge={{ label: "Registration Open", variant: "info" }}
-                  metadata={[
-                    { icon: MapPin, label: "New York, NY" },
-                    { icon: Calendar, label: "July 15, 2024" },
-                    { icon: Users, label: "24/32 Players" },
-                    { icon: Gamepad2, label: "Magic: The Gathering" }
-                  ]}
-                  href="/tournaments/summer-2024"
-                  ctaText="View Details"
-                />
-                <TournamentCard
-                  title="Weekly Game Night"
-                  badge={{ label: "Tonight", variant: "success" }}
-                  metadata={[
-                    { icon: MapPin, label: "Local Game Store" },
-                    { icon: Calendar, label: "Every Friday 7PM" },
-                    { icon: Users, label: "8-12 Players" }
-                  ]}
-                  href="/events/game-night"
-                  ctaText="RSVP Now →"
-                />
-                <TournamentCard
-                  title="Regional Finals"
-                  badge={{ label: "Sold Out", variant: "danger" }}
-                  metadata={[
-                    { icon: MapPin, label: "San Francisco, CA" },
-                    { icon: Calendar, label: "Aug 20-22, 2024" },
-                    { icon: DollarSign, label: "$50 Entry" }
-                  ]}
-                  footer={
-                    <button className="text-sm text-blue-600 font-semibold">
-                      Join Waitlist
-                    </button>
-                  }
-                />
+            {/* Modal & Alerts */}
+            <div className="mb-20">
+              <h3 className="text-2xl font-bold text-foreground mb-6">Modals & Feedback</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                  <ErrorAlert.Root>
+                    <ErrorAlert.Title>System Error</ErrorAlert.Title>
+                    <ErrorAlert.Description>
+                      Unable to connect to the game server. Please check your internet connection.
+                    </ErrorAlert.Description>
+                    <ErrorAlert.Action onClick={() => {}}>Retry Connection</ErrorAlert.Action>
+                  </ErrorAlert.Root>
+                  
+                  <ErrorAlert.Root variant="warning">
+                    <ErrorAlert.Title>Low Balance</ErrorAlert.Title>
+                    <ErrorAlert.Description>
+                      Your account balance is low. Please top up to join more tournaments.
+                    </ErrorAlert.Description>
+                  </ErrorAlert.Root>
+                </div>
+                <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-xl">
+                  <Button onClick={() => setIsWinnerModalOpen(true)} size="lg">
+                    Open Winner Modal
+                  </Button>
+                  <p className="mt-4 text-sm text-muted-foreground">Click to test the Dialog primitive composition</p>
+                </div>
               </div>
             </div>
 
-            {/* Match Cards */}
-            <div className="mb-16">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Match Cards</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <MatchCard
-                  match={{
-                    id: "m1",
-                    tableNumber: 1,
-                    round: 3,
-                    status: "completed",
-                    players: ["Alice Johnson", "Bob Smith"],
-                    winner: "Alice Johnson"
-                  }}
-                />
-                <MatchCard
-                  match={{
-                    id: "m2",
-                    tableNumber: 5,
-                    round: 3,
-                    status: "pending",
-                    players: ["Charlie Brown", "Diana Prince"]
-                  }}
-                />
+            {/* Empty States */}
+            <div className="mb-20">
+              <h3 className="text-2xl font-bold text-foreground mb-6">Empty States</h3>
+              <div className="bg-muted/30 rounded-2xl border border-border">
+                <EmptyState.Root>
+                  <EmptyState.Icon icon={Trophy} />
+                  <EmptyState.Title>No Tournaments Yet</EmptyState.Title>
+                  <EmptyState.Description>
+                    You haven't joined any tournaments. Start your competitive journey today!
+                  </EmptyState.Description>
+                  <EmptyState.Actions>
+                    <Button>Explore Tournaments</Button>
+                  </EmptyState.Actions>
+                </EmptyState.Root>
               </div>
             </div>
 
             {/* Timers */}
             <div className="mb-16">
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Timers</h3>
+              <h3 className="text-2xl font-bold text-foreground mb-6">Timers</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Countdown
                   initialSeconds={1800}
@@ -378,6 +314,7 @@ export default function ComponentGallery() {
                 <Countdown
                   initialSeconds={-120}
                   size="md"
+                  variant="overtime"
                   overtimeMessage="Overtime!"
                   autoStart={false}
                 />
@@ -387,285 +324,38 @@ export default function ComponentGallery() {
         </section>
 
         {/* ========================================
-            TESTIMONIALS SECTION
+            LEGACY COMPONENTS (Demos)
         ======================================== */}
         
-        {/* Testimonials - White Variant */}
-        <Testimonials
-          title="What our customers say"
-          description="Trusted by tournament organizers worldwide"
-          variant="white"
-          testimonials={[
-            {
-              name: "Sarah Johnson",
-              role: "Tournament Director, GameCon",
-              content: "CardArena transformed how we run our tournaments. The components are beautiful, fast, and incredibly easy to customize.",
-              rating: 5
-            },
-            {
-              name: "Mike Chen",
-              role: "Store Owner, Dragon's Lair",
-              content: "We've been using CardArena for 6 months and our player satisfaction has never been higher. The real-time updates are a game changer.",
-              rating: 5
-            },
-            {
-              name: "Emily Rodriguez",
-              role: "Event Coordinator",
-              content: "The best tournament management platform I've used. Clean design, powerful features, and excellent documentation.",
-              rating: 5
-            }
-          ]}
-        />
-
-        {/* Testimonials - Individual Cards */}
-        <section className="py-12 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Testimonial Card Variants</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <TestimonialCard
-                name="John Doe"
-                role="CEO, TechCorp"
-                content="This product changed our business completely!"
-                rating={5}
-                variant="gray"
-              />
-              <TestimonialCard
-                name="Jane Smith"
-                role="Marketing Director"
-                content="Outstanding service and support. Highly recommended!"
-                rating={5}
-                avatar="https://i.pravatar.cc/150?img=4"
-                variant="white"
-              />
-              <TestimonialCard
-                name="Alex Taylor"
-                role="Product Manager"
-                content="The best investment we've made this year."
-                avatar={<div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">AT</div>}
-                variant="bordered"
-                showQuotes={false}
-                rating={4}
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================
-            PRICING SECTION
-        ======================================== */}
-        
-        {/* Pricing - Light Variant */}
-        <Pricing
-          title="Simple, Transparent Pricing"
-          description="Choose the plan that fits your needs"
+        <Features
+          title="Everything you need"
+          description="Professional tools for perfect tournaments"
           variant="light"
-          plans={[
+          features={[
             {
-              name: "Starter",
-              price: "$9/mo",
-              features: [
-                "Up to 32 players",
-                "Basic bracket management",
-                "Email support",
-                "1GB storage"
-              ],
-              buttonText: "Get Started",
-              isPopular: false
+              icon: <Zap className="w-8 h-8" />,
+              title: "Lightning Fast",
+              description: "Built with React 19 Server Components for maximum performance."
             },
             {
-              name: "Pro",
-              price: "$29/mo",
-              features: [
-                "Unlimited players",
-                "Advanced brackets",
-                "Priority support",
-                "Real-time updates",
-                "Custom branding",
-                "10GB storage"
-              ],
-              buttonText: "Start Free Trial",
-              isPopular: true
+              icon: <Shield className="w-8 h-8" />,
+              title: "Secure & Reliable",
+              description: "Type-safe APIs and validated data processing ensure smooth runs."
             },
             {
-              name: "Enterprise",
-              price: "Custom",
-              features: [
-                "Everything in Pro",
-                "Dedicated support",
-                "Custom integrations",
-                "SLA guarantee",
-                "Unlimited storage",
-                "White-label option"
-              ],
-              buttonText: "Contact Sales",
-              isPopular: false
+              icon: <Rocket className="w-8 h-8" />,
+              title: "Scalable",
+              description: "Modular components based on Atomic Design principles."
             }
           ]}
         />
 
-        {/* Pricing Cards - Individual Variants */}
-        <section className="py-12 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Pricing Card Variants</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <PricingCard
-                name="Basic"
-                price="$0"
-                priceDescription="per month, billed annually"
-                features={["5 tournaments/month", "Basic support", "Community access"]}
-                buttonText="Get Started Free"
-                buttonHref="/signup"
-              />
-              <PricingCard
-                name="Premium"
-                price="$49"
-                priceDescription="per user / month"
-                description="Best for professionals"
-                features={["Unlimited tournaments", "Priority support", "Advanced analytics", "Custom branding"]}
-                buttonText="Start Trial"
-                isPopular={true}
-                highlightColor="blue"
-                buttonHref="/signup?plan=premium"
-              />
-              <PricingCard
-                name="Ultimate"
-                price={<span className="text-2xl">Contact Us</span>}
-                priceDescription="Custom pricing for custom needs"
-                features={["Everything in Premium", "Dedicated account manager", "Custom development", "24/7 phone support"]}
-                buttonText="Schedule Demo"
-                buttonVariant="outline"
-                buttonHref="/contact"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================
-            COMPOSED COMPONENTS
-        ======================================== */}
-        
-        {/* Status Banner */}
-        <section className="py-12 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Status Banners</h3>
-            <div className="space-y-6">
-              <StatusBanner
-                primaryStatus={{ label: "Tournament", value: "Active", variant: "success" }}
-                centerInfo={{
-                  label: "Round",
-                  value: 3,
-                  statusLabel: "In Progress",
-                  icon: Settings,
-                  animateIcon: true
-                }}
-                secondaryStatus={{ label: "Players", current: 24, max: 32 }}
-                mainMessage="Round 3 is currently in progress"
-                subMessages={[
-                  { text: "12 matches active", icon: Clock },
-                  { text: "8 players waiting", icon: Users }
-                ]}
-                variant="info"
-              />
-              <StatusBanner
-                primaryStatus={{ label: "Event", value: "Registration Open", variant: "success" }}
-                secondaryStatus={{ label: "Attendees", current: 156, max: 200 }}
-                mainMessage="Early bird tickets available"
-                subMessages={[{ text: "Downtown Venue", icon: MapPin }]}
-                variant="success"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* QR Registration Banner */}
-        <section className="py-12 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">QR Registration Banner</h3>
-            <div className="space-y-6">
-              <QRRegistrationBanner
-                registrationUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                title="Scan to Register"
-                description="Join the tournament by scanning this QR code with your phone"
-                variant="accent"
-              />
-              <QRRegistrationBanner
-                registrationUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                title="Quick Check-In"
-                description="Scan for instant event registration and updates"
-                variant="success"
-              />
-              <QRRegistrationBanner
-                registrationUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-                title="Get Started Today"
-                description="Scan to create your player profile and join the community"
-                variant="default"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Tab Section */}
-        <section className="py-12 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">Tab Sections</h3>
-            <div className="space-y-6">
-              <TabSection
-                title="Account Settings"
-                description="Manage your account preferences and profile information"
-                icon={Settings}
-                success="Settings saved successfully!"
-              >
-                <div className="space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-gray-600">Form fields would go here...</p>
-                  </div>
-                </div>
-              </TabSection>
-              <TabSection
-                title="Security"
-                description="Update your password and security settings"
-                icon={Shield}
-                error="Failed to update password. Please try again."
-              >
-                <div className="space-y-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-gray-600">Security form fields would go here...</p>
-                  </div>
-                </div>
-              </TabSection>
-            </div>
-          </div>
-        </section>
-
-        {/* ========================================
-            CTA SECTIONS
-        ======================================== */}
-        
-        {/* CTA - Default Variant */}
         <CTA
           title="Ready for your first tournament?"
           description="Get started today and experience how simple tournament management can be."
           buttonText="Sign up for free"
           buttonHref="/signup"
-          variant="default"
-        />
-
-        {/* CTA - Gradient Variant */}
-        <CTA
-          title="Take your tournaments to the next level"
-          description="Join thousands of organizers who trust CardArena for their events."
-          buttonText="Explore Features"
-          buttonHref="/features"
           variant="gradient"
-        />
-
-        {/* CTA - Dark Variant */}
-        <CTA
-          title="Questions? We're here to help"
-          description="Our team is ready to answer your questions and help you get started."
-          buttonText="Contact Sales"
-          buttonHref="/contact"
-          variant="dark"
         />
       </main>
 
@@ -673,53 +363,52 @@ export default function ComponentGallery() {
           FOOTER
       ======================================== */}
       
-      {/* Footer - Dark Variant */}
       <Footer
         brand={{
           name: "CardArena",
-          description: "Professional tournament management for card games and competitive gaming."
+          description: "Professional tournament management for card games."
         }}
         columns={[
           {
             title: "Product",
             links: [
-              { label: "Features", href: "/features" },
-              { label: "Pricing", href: "/pricing" },
-              { label: "Documentation", href: "/docs" },
-              { label: "API Reference", href: "/api" }
-            ]
-          },
-          {
-            title: "Company",
-            links: [
-              { label: "About", href: "/about" },
-              { label: "Blog", href: "/blog" },
-              { label: "Careers", href: "/careers" },
-              { label: "Press Kit", href: "/press" }
+              { label: "Features", href: "#" },
+              { label: "Pricing", href: "#" },
+              { label: "Docs", href: "#" }
             ]
           },
           {
             title: "Resources",
             links: [
-              { label: "Community", href: "/community" },
-              { label: "Support", href: "/support" },
-              { label: "Status", href: "/status" },
-              { label: "Changelog", href: "/changelog" }
-            ]
-          },
-          {
-            title: "Legal",
-            links: [
-              { label: "Privacy", href: "/privacy" },
-              { label: "Terms", href: "/terms" },
-              { label: "Security", href: "/security" },
-              { label: "Cookies", href: "/cookies" }
+              { label: "Community", href: "#" },
+              { label: "Support", href: "#" },
+              { label: "Status", href: "#" }
             ]
           }
         ]}
-        copyright="CardArena. All rights reserved."
+        copyright="CardArena Core. All rights reserved."
         variant="dark"
       />
+
+      {/* Winner Modal Composition */}
+      <WinnerModal.Root open={isWinnerModalOpen} onOpenChange={setIsWinnerModalOpen}>
+        <WinnerModal.Portal>
+          <WinnerModal.Overlay />
+          <WinnerModal.Content>
+            <WinnerModal.Title>Select Winner</WinnerModal.Title>
+            <WinnerModal.Options>
+              <WinnerModal.Option onClick={() => setIsWinnerModalOpen(false)}>
+                Alice Johnson
+              </WinnerModal.Option>
+              <WinnerModal.Option onClick={() => setIsWinnerModalOpen(false)}>
+                Bob Smith
+              </WinnerModal.Option>
+            </WinnerModal.Options>
+            <WinnerModal.Cancel onClick={() => setIsWinnerModalOpen(false)}>Cancel</WinnerModal.Cancel>
+            <WinnerModal.Stripe />
+          </WinnerModal.Content>
+        </WinnerModal.Portal>
+      </WinnerModal.Root>
     </div>
   );
 }

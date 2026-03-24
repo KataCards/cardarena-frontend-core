@@ -213,12 +213,12 @@ export function Accordion({
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 {Icon && (
                   <Icon
-                    className="shrink-0 text-gray-600"
+                    className="shrink-0 text-muted-foreground"
                     size={20}
                     aria-hidden="true"
                   />
                 )}
-                <span className="text-base font-semibold text-gray-900 truncate">
+                <span className="text-base font-semibold text-foreground truncate">
                   {item.title}
                 </span>
                 {item.badge && (
@@ -263,8 +263,8 @@ export function AccordionItem({
   return (
     <div
       className={cn(
-        "border border-gray-200 rounded-lg overflow-hidden transition-all duration-200",
-        "hover:border-gray-300",
+        "border border-border rounded-lg overflow-hidden transition-all duration-200",
+        "hover:border-muted-foreground/30",
         disabled && "opacity-60 cursor-not-allowed",
         className
       )}
@@ -304,19 +304,55 @@ export function AccordionHeader({
   children,
   ...rest
 }: AccordionHeaderProps) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (disabled) return;
+
+    // Handle Enter/Space for toggle
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onToggle(id);
+      return;
+    }
+
+    // Handle Arrow key navigation
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const currentButton = e.currentTarget;
+      const allButtons = Array.from(
+        document.querySelectorAll<HTMLButtonElement>(
+          '[role="button"][aria-expanded]'
+        )
+      );
+      const currentIndex = allButtons.indexOf(currentButton);
+
+      if (currentIndex === -1) return;
+
+      let nextIndex: number;
+      if (e.key === "ArrowDown") {
+        nextIndex = (currentIndex + 1) % allButtons.length;
+      } else {
+        nextIndex = (currentIndex - 1 + allButtons.length) % allButtons.length;
+      }
+
+      allButtons[nextIndex]?.focus();
+    }
+  };
+
   return (
     <button
       type="button"
+      role="button"
       onClick={() => !disabled && onToggle(id)}
+      onKeyDown={handleKeyDown}
       disabled={disabled}
       aria-expanded={isExpanded}
       aria-disabled={disabled}
       className={cn(
         "w-full flex items-center justify-between px-4 py-3 text-left",
-        "bg-gray-50 hover:bg-gray-100 active:bg-gray-200",
+        "bg-muted hover:bg-muted/80 active:bg-muted/60",
         "transition-colors duration-150",
-        "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-0",
-        "disabled:hover:bg-gray-50 disabled:cursor-not-allowed",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
+        "disabled:hover:bg-muted disabled:cursor-not-allowed",
         className
       )}
       {...rest}
@@ -327,7 +363,7 @@ export function AccordionHeader({
       <ChevronDown
         size={20}
         className={cn(
-          "shrink-0 text-gray-600 transition-transform duration-200",
+          "shrink-0 text-muted-foreground transition-transform duration-200",
           isExpanded && "rotate-180"
         )}
         aria-hidden="true"
@@ -391,7 +427,7 @@ export function AccordionContent({
       }}
       {...rest}
     >
-      <div className={cn("px-4 py-3 border-t border-gray-200 bg-white", className)}>
+      <div className={cn("px-4 py-3 border-t border-border bg-background", className)}>
         {children}
       </div>
     </div>
@@ -414,6 +450,7 @@ export function AccordionContent({
  *   </Accordion.Item>
  * </Accordion.Root>
  */
+Accordion.Root = Accordion
 Accordion.Item = AccordionItem;
 Accordion.Header = AccordionHeader;
 Accordion.Content = AccordionContent;
