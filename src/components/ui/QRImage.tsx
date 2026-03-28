@@ -12,6 +12,8 @@ export interface QRImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   backgroundColor?: string;
   /** Error correction level @default "M" */
   errorCorrectionLevel?: "L" | "M" | "Q" | "H";
+  /** Accessible description of what the QR code links to — required */
+  alt: string;
 }
 
 /**
@@ -19,14 +21,14 @@ export interface QRImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
  * Generates QR codes on the server to eliminate layout shift and reduce client bundle size.
  *
  * @example
- * <QRImage url="https://example.com/register" alt="QR code" />
+ * <QRImage url="https://example.com/register" alt="Registration page QR code" />
  *
  * @example
  * <QRImage
  *   url="https://example.com/register"
  *   size={512}
  *   className="rounded-lg shadow-lg"
- *   alt="Event QR code"
+ *   alt="Event registration QR code"
  * />
  */
 export async function QRImage({
@@ -35,7 +37,7 @@ export async function QRImage({
   color = "#000000",
   backgroundColor = "#ffffff",
   errorCorrectionLevel = "M",
-  alt = "QR code",
+  alt,
   className,
   ...props
 }: QRImageProps) {
@@ -57,28 +59,25 @@ export async function QRImage({
         width={size}
         height={size}
         className={cn("block", className)}
-        decoding="async"
-        loading="lazy"
         {...props}
       />
     );
   } catch (error) {
     console.error("Failed to generate QR code:", error);
 
-    // Return a semantic error state using theme tokens
     return (
       <div
         style={{ width: size, height: size }}
         className={cn(
           "flex items-center justify-center rounded",
-          "bg-destructive/10 border border-destructive/30",
+          "bg-red-50 border border-red-200",
           className
         )}
         role="img"
-        aria-label={`Failed to generate QR code for ${alt}`}
-        {...props}
+        aria-label={`Failed to generate QR code for: ${alt}`}
+        {...props as React.HTMLAttributes<HTMLDivElement>}
       >
-        <span className="text-destructive text-sm font-medium">QR Code Error</span>
+        <span className="text-red-600 text-sm font-medium">QR Code Error</span>
       </div>
     );
   }

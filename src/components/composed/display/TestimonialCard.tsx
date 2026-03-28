@@ -1,7 +1,12 @@
+import * as React from "react";
+import Image from "next/image";
 import { Star } from "lucide-react";
-import { ReactNode } from "react";
+import { Card, CardContent } from "@/components/ui/Card";
+import { cn } from "@/lib/utils";
 
-export interface TestimonialCardProps {
+type TestimonialCardVariant = "muted" | "base" | "outlined";
+
+export interface TestimonialCardProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Customer name */
   name: string;
   /** Customer role or title */
@@ -11,55 +16,24 @@ export interface TestimonialCardProps {
   /** Rating out of 5 stars */
   rating?: number;
   /** Optional avatar image URL or element */
-  avatar?: string | ReactNode;
-  /** Card background variant */
-  variant?: "gray" | "white" | "bordered";
+  avatar?: string | React.ReactNode;
+  /** Card surface variant */
+  variant?: TestimonialCardVariant;
   /** Whether to show quote marks */
   showQuotes?: boolean;
 }
 
-const variants = {
-  gray: "bg-gray-50",
-  white: "bg-white shadow-sm",
-  bordered: "bg-white border-2 border-gray-200",
+const variantStyles: Record<TestimonialCardVariant, string> = {
+  muted: "bg-muted/30",
+  base: "bg-card",
+  outlined: "bg-card border-2 border-border",
 };
 
 /**
  * TestimonialCard
- * 
+ *
  * A card component for displaying customer testimonials with ratings, avatars,
- * and customizable styling.
- * 
- * @example
- * // Basic usage
- * <TestimonialCard
- *   name="John Doe"
- *   role="CEO, TechCorp"
- *   content="This product changed our business completely!"
- *   rating={5}
- * />
- * 
- * @example
- * // With avatar and custom variant
- * <TestimonialCard
- *   name="Jane Smith"
- *   role="Marketing Director"
- *   content="Outstanding service and support. Highly recommended!"
- *   rating={5}
- *   avatar="/avatars/jane.jpg"
- *   variant="white"
- * />
- * 
- * @example
- * // Without rating, with custom avatar element
- * <TestimonialCard
- *   name="Mike Johnson"
- *   role="Product Manager"
- *   content="The best investment we've made this year."
- *   avatar={<div className="w-12 h-12 bg-blue-500 rounded-full" />}
- *   variant="bordered"
- *   showQuotes={false}
- * />
+ * and semantic styling.
  */
 export function TestimonialCard({
   name,
@@ -67,47 +41,58 @@ export function TestimonialCard({
   content,
   rating = 5,
   avatar,
-  variant = "gray",
+  variant = "muted",
   showQuotes = true,
+  className,
+  ...props
 }: TestimonialCardProps) {
   return (
-    <div className={`${variants[variant]} p-8 rounded-xl`}>
-      {/* Rating */}
-      {rating > 0 && (
-        <div className="flex mb-4">
-          {[...Array(rating)].map((_, i) => (
-            <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
-          ))}
-        </div>
-      )}
-
-      {/* Content */}
-      <p className="text-gray-700 mb-6 italic">
-        {showQuotes && '"'}
-        {content}
-        {showQuotes && '"'}
-      </p>
-
-      {/* Author */}
-      <div className="flex items-center gap-3">
-        {avatar && (
-          <div className="shrink-0">
-            {typeof avatar === "string" ? (
-              <img
-                src={avatar}
-                alt={name}
-                className="w-12 h-12 rounded-full object-cover"
+    <Card className={cn("h-full shadow-sm", variantStyles[variant], className)} {...props}>
+      <CardContent className="p-8">
+        {rating > 0 ? (
+          <div
+            className="mb-4 flex"
+            aria-label={`${rating} out of 5 stars`}
+            role="img"
+          >
+            {Array.from({ length: rating }).map((_, index) => (
+              <Star
+                key={`${name}-star-${index}`}
+                className="h-5 w-5 fill-current text-warning"
+                aria-hidden="true"
               />
-            ) : (
-              avatar
-            )}
+            ))}
           </div>
-        )}
-        <div>
-          <div className="font-semibold text-gray-900">{name}</div>
-          <div className="text-gray-600 text-sm">{role}</div>
+        ) : null}
+
+        <p className="mb-6 italic text-foreground">
+          {showQuotes ? '"' : null}
+          {content}
+          {showQuotes ? '"' : null}
+        </p>
+
+        <div className="flex items-center gap-3">
+          {avatar ? (
+            <div className="shrink-0">
+              {typeof avatar === "string" ? (
+                <Image
+                  src={avatar}
+                  alt={name}
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 rounded-full object-cover"
+                />
+              ) : (
+                avatar
+              )}
+            </div>
+          ) : null}
+          <div>
+            <div className="font-semibold text-foreground">{name}</div>
+            <div className="text-sm text-muted-foreground">{role}</div>
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

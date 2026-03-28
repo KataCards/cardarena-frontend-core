@@ -1,91 +1,104 @@
-// components/composed/Features.tsx
+import * as React from "react";
 import { FeatureCard } from "@/components/composed/display/FeatureCard";
-import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+
+type FeaturesHeading = "h1" | "h2" | "h3" | "h4";
+type FeaturesMaxWidth = "xl" | "2xl" | "5xl" | "7xl" | "full";
 
 export interface Feature {
-  icon: ReactNode;
+  icon: React.ReactNode;
   title: string;
   description: string;
 }
 
-interface FeaturesProps {
+interface FeaturesProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
   /** Array of feature objects to display in the grid */
-  features: Feature[];
+  features: readonly Feature[];
   /** Main heading text for the features section */
-  title?: string;
+  title?: React.ReactNode;
   /** Supporting description text below the title */
-  description?: string;
-  /** Background color variant for different page contexts */
-  variant?: "light" | "white" | "dark";
+  description?: React.ReactNode;
+  /** Semantic heading level. @default "h2" */
+  as?: FeaturesHeading;
+  /** Surface variant for different page contexts */
+  variant?: "muted" | "base" | "surface";
+  /** Width constraint for the section content. @default "7xl" */
+  maxWidth?: FeaturesMaxWidth;
 }
+
+const variantStyles = {
+  muted: {
+    section: "bg-muted/30",
+    title: "text-foreground",
+    description: "text-muted-foreground",
+  },
+  base: {
+    section: "bg-background",
+    title: "text-foreground",
+    description: "text-muted-foreground",
+  },
+  surface: {
+    section: "bg-card",
+    title: "text-card-foreground",
+    description: "text-muted-foreground",
+  },
+} as const;
+
+const maxWidthStyles: Record<FeaturesMaxWidth, string> = {
+  xl: "max-w-6xl",
+  "2xl": "max-w-screen-2xl",
+  "5xl": "max-w-5xl",
+  "7xl": "max-w-7xl",
+  full: "max-w-full",
+};
 
 /**
  * Features Section
- * 
+ *
  * Displays a grid of feature cards with a centered heading and description.
  * Responsive layout adapts from single column on mobile to three columns on desktop.
- * 
- * @example
- * // Basic usage with custom features
- * <Features 
- *   features={[
- *     { icon: <Trophy />, title: "Tournament Brackets", description: "..." },
- *     { icon: <Users />, title: "Player Management", description: "..." },
- *   ]} 
- * />
- * 
- * @example
- * // Custom heading and dark variant
- * <Features 
- *   variant="dark"
- *   title="Why Choose CardArena?"
- *   description="Built by tournament organizers, for tournament organizers"
- *   features={featuresList}
- * />
- * 
- * @example
- * // White background for alternating sections
- * <Features 
- *   variant="white"
- *   title="Core Features"
- *   description="Everything you need to run professional tournaments"
- *   features={coreFeatures}
- * />
  */
 export function Features({
   features,
   title = "Everything you need",
   description = "Professional tools for perfect tournaments",
-  variant = "light",
+  as = "h2",
+  variant = "muted",
+  maxWidth = "7xl",
+  className,
+  ...props
 }: FeaturesProps) {
-  const variants = {
-    light: "bg-gray-50",
-    white: "bg-white",
-    dark: "bg-slate-900",
-  };
-
-  const textColors = {
-    light: { title: "text-gray-900", description: "text-gray-600" },
-    white: { title: "text-gray-900", description: "text-gray-600" },
-    dark: { title: "text-white", description: "text-slate-300" },
-  };
-
-  const colors = textColors[variant];
+  const Heading = as;
+  const titleId = React.useId();
+  const styles = variantStyles[variant];
+  const isPlainDescription =
+    typeof description === "string" || typeof description === "number";
 
   return (
-    <section className={`py-20 ${variants[variant]}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="text-center mb-16">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${colors.title}`}>
+    <section
+      aria-labelledby={titleId}
+      className={cn("py-20", styles.section, className)}
+      {...props}
+    >
+      <div className={cn("mx-auto px-4 sm:px-6 lg:px-8", maxWidthStyles[maxWidth])}>
+        <header className="mb-16 text-center">
+          <Heading
+            id={titleId}
+            className={cn("mb-4 text-3xl font-bold md:text-4xl", styles.title)}
+          >
             {title}
-          </h2>
-          <p className={`text-xl ${colors.description}`}>
-            {description}
-          </p>
+          </Heading>
+          {description ? (
+            isPlainDescription ? (
+              <p className={cn("text-xl", styles.description)}>{description}</p>
+            ) : (
+              <div className={cn("text-xl", styles.description)}>{description}</div>
+            )
+          ) : null}
         </header>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature) => (
+            <FeatureCard key={feature.title} {...feature} />
           ))}
         </div>
       </div>

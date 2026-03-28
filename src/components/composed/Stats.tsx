@@ -1,4 +1,8 @@
-import React from "react";
+import * as React from "react";
+import { cn } from "@/lib/utils";
+
+type StatsHeading = "h1" | "h2" | "h3" | "h4";
+type StatsVariant = "muted" | "base" | "surface";
 
 export interface Stat {
   /** The primary metric value (e.g., "1000+", "24/7", "99%") */
@@ -11,141 +15,143 @@ export interface Stat {
   variant?: "default" | "primary" | "success" | "info";
 }
 
-interface StatsProps {
+interface StatsProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
   /** Array of statistics to display */
-  stats: Stat[];
+  stats: readonly Stat[];
   /** Optional heading text for the stats section */
-  title?: string;
+  title?: React.ReactNode;
   /** Optional description text below the title */
-  description?: string;
+  description?: React.ReactNode;
+  /** Semantic heading level. @default "h2" */
+  as?: StatsHeading;
   /** Number of columns on desktop (2, 3, or 4) */
   columns?: 2 | 3 | 4;
-  /** Background variant for different page contexts */
-  variant?: "light" | "white" | "dark";
+  /** Surface variant */
+  variant?: StatsVariant;
 }
 
-const variantStyles = {
-  light: {
-    section: "bg-gray-50",
-    title: "text-gray-900",
-    description: "text-gray-600",
+const sectionStyles = {
+  muted: {
+    section: "bg-muted/30",
+    title: "text-foreground",
+    description: "text-muted-foreground",
+    label: "text-muted-foreground",
+    defaultValue: "text-foreground",
   },
-  white: {
-    section: "bg-white",
-    title: "text-gray-900",
-    description: "text-gray-600",
+  base: {
+    section: "bg-background",
+    title: "text-foreground",
+    description: "text-muted-foreground",
+    label: "text-muted-foreground",
+    defaultValue: "text-foreground",
   },
-  dark: {
-    section: "bg-slate-900",
-    title: "text-white",
-    description: "text-slate-300",
+  surface: {
+    section: "bg-card",
+    title: "text-card-foreground",
+    description: "text-muted-foreground",
+    label: "text-muted-foreground",
+    defaultValue: "text-card-foreground",
   },
-};
+} as const;
 
-const statVariants = {
-  default: "text-gray-900",
-  primary: "text-red-600",
-  success: "text-green-600",
-  info: "text-blue-600",
-};
+const statVariantStyles = {
+  default: {
+    icon: "",
+    value: "",
+  },
+  primary: {
+    icon: "text-primary",
+    value: "text-primary",
+  },
+  success: {
+    icon: "text-success",
+    value: "text-success",
+  },
+  info: {
+    icon: "text-info",
+    value: "text-info",
+  },
+} as const;
+
+const gridCols = {
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-3",
+  4: "md:grid-cols-4",
+} as const;
 
 /**
  * Stats Section
- * 
+ *
  * A responsive grid for displaying key metrics and statistics.
- * Supports optional icons, custom colors, and flexible column layouts.
- * 
- * @example
- * // Basic usage
- * <Stats 
- *   stats={[
- *     { value: "10K+", label: "Active Users" },
- *     { value: "500+", label: "Tournaments" },
- *     { value: "99.9%", label: "Uptime" },
- *     { value: "24/7", label: "Support" }
- *   ]}
- * />
- * 
- * @example
- * // With title and icons
- * import { Users, Trophy, Zap, Clock } from "lucide-react";
- * 
- * <Stats
- *   title="Platform Statistics"
- *   description="Trusted by thousands worldwide"
- *   columns={4}
- *   stats={[
- *     { value: "10K+", label: "Active Users", icon: Users, variant: "primary" },
- *     { value: "500+", label: "Tournaments", icon: Trophy, variant: "success" },
- *     { value: "99.9%", label: "Uptime", icon: Zap, variant: "info" },
- *     { value: "24/7", label: "Support", icon: Clock }
- *   ]}
- * />
- * 
- * @example
- * // Dark variant with 3 columns
- * <Stats
- *   variant="dark"
- *   columns={3}
- *   title="Why Choose Us"
- *   stats={companyStats}
- * />
+ * Supports optional icons, semantic emphasis, and flexible column layouts.
  */
-export function Stats({ 
-  stats, 
+export function Stats({
+  stats,
   title,
   description,
+  as = "h2",
   columns = 4,
-  variant = "white",
+  variant = "base",
+  className,
+  ...props
 }: StatsProps) {
-  const styles = variantStyles[variant];
-  const gridCols = {
-    2: "md:grid-cols-2",
-    3: "md:grid-cols-3",
-    4: "md:grid-cols-4",
-  };
+  const Heading = as;
+  const titleId = React.useId();
+  const styles = sectionStyles[variant];
+  const isPlainDescription =
+    typeof description === "string" || typeof description === "number";
 
   return (
-    <section className={`py-16 ${styles.section}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {(title || description) && (
-          <header className="text-center mb-12">
-            {title && (
-              <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${styles.title}`}>
+    <section
+      aria-labelledby={title ? titleId : undefined}
+      className={cn("py-16", styles.section, className)}
+      {...props}
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {(title || description) ? (
+          <header className="mb-12 text-center">
+            {title ? (
+              <Heading
+                id={titleId}
+                className={cn("mb-4 text-3xl font-bold md:text-4xl", styles.title)}
+              >
                 {title}
-              </h2>
-            )}
-            {description && (
-              <p className={`text-xl ${styles.description}`}>
-                {description}
-              </p>
-            )}
+              </Heading>
+            ) : null}
+            {description ? (
+              isPlainDescription ? (
+                <p className={cn("text-xl", styles.description)}>{description}</p>
+              ) : (
+                <div className={cn("text-xl", styles.description)}>{description}</div>
+              )
+            ) : null}
           </header>
-        )}
-        
-        <div className={`grid grid-cols-2 ${gridCols[columns]} gap-8`}>
-          {stats.map((stat, index) => {
+        ) : null}
+
+        <div role="list" className={cn("grid grid-cols-2 gap-8", gridCols[columns])}>
+          {stats.map((stat) => {
             const Icon = stat.icon;
-            
-            // Adjust default text color based on the section variant (dark mode)
-            let valueColor = statVariants[stat.variant || "default"];
-            if (!stat.variant && variant === "dark") {
-              valueColor = "text-white";
-            }
-            
+            const accent = statVariantStyles[stat.variant ?? "default"];
+
             return (
-              <div key={index} className="text-center">
-                {Icon && (
-                  <div className="flex justify-center mb-3">
-                    <Icon className={`h-8 w-8 ${valueColor}`} />
+              <div key={stat.label} role="listitem" className="text-center">
+                {Icon ? (
+                  <div className="mb-3 flex justify-center">
+                    <Icon
+                      className={cn("h-8 w-8", accent.icon || styles.defaultValue)}
+                      aria-hidden="true"
+                    />
                   </div>
-                )}
-                <div className={`text-3xl md:text-4xl font-bold mb-2 ${valueColor}`}>
+                ) : null}
+                <div
+                  className={cn(
+                    "mb-2 text-3xl font-bold md:text-4xl",
+                    accent.value || styles.defaultValue
+                  )}
+                >
                   {stat.value}
                 </div>
-                <div className={variant === "dark" ? "text-slate-400" : "text-gray-600"}>
-                  {stat.label}
-                </div>
+                <div className={styles.label}>{stat.label}</div>
               </div>
             );
           })}

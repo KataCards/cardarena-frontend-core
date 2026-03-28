@@ -1,18 +1,23 @@
+import * as React from "react";
 import { CheckCircle } from "lucide-react";
-import { ReactNode } from "react";
-import { Button } from "./Button";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 
-export interface PricingCardProps {
+type PricingCardHeading = "h2" | "h3" | "h4" | "h5" | "h6";
+type PricingCardHighlight = "primary" | "info" | "secondary";
+
+export interface PricingCardProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Plan name */
   name: string;
   /** Price display (can include currency, period, etc.) */
-  price: string | ReactNode;
+  price: string | React.ReactNode;
   /** Optional text displayed next to or below the price (e.g., "per user / month") */
   priceDescription?: string;
   /** Optional plan description */
   description?: string;
   /** List of features included in the plan */
-  features: string[];
+  features: readonly string[];
   /** Call-to-action button text */
   buttonText: string;
   /** Optional button click handler */
@@ -24,84 +29,36 @@ export interface PricingCardProps {
   /** Popular badge text */
   popularText?: string;
   /** Button variant override */
-  buttonVariant?: "solid" | "outline" | "ghost";
-  /** Color scheme for popular plan */
-  highlightColor?: "red" | "blue" | "purple";
+  buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+  /** Highlight color for popular plan */
+  highlightColor?: PricingCardHighlight;
+  /** Semantic heading level for the plan title. @default "h3" */
+  as?: PricingCardHeading;
 }
 
-const highlightColors = {
-  red: {
-    border: "border-red-600",
-    badge: "bg-red-600",
-    button: "red" as const,
+const highlightStyles: Record<
+  PricingCardHighlight,
+  { border: string; badgeVariant: React.ComponentProps<typeof Badge>["variant"] }
+> = {
+  primary: {
+    border: "border-primary",
+    badgeVariant: "default",
   },
-  blue: {
-    border: "border-blue-600",
-    badge: "bg-blue-600",
-    button: "dark" as const,
+  info: {
+    border: "border-info",
+    badgeVariant: "info",
   },
-  purple: {
-    border: "border-purple-600",
-    badge: "bg-purple-600",
-    button: "dark" as const,
+  secondary: {
+    border: "border-secondary",
+    badgeVariant: "secondary",
   },
 };
 
 /**
  * PricingCard
- * 
+ *
  * A card component for displaying pricing plans with features, pricing,
  * and call-to-action buttons. Supports highlighting popular plans.
- * 
- * @example
- * // Basic pricing card
- * <PricingCard
- *   name="Starter"
- *   price="$9/mo"
- *   features={[
- *     "Up to 10 users",
- *     "Basic support",
- *     "1GB storage"
- *   ]}
- *   buttonText="Get Started"
- *   buttonHref="/signup?plan=starter"
- * />
- * 
- * @example
- * // Popular plan with custom styling
- * <PricingCard
- *   name="Pro"
- *   price="$29/mo"
- *   description="Perfect for growing teams"
- *   features={[
- *     "Unlimited users",
- *     "Priority support",
- *     "100GB storage",
- *     "Advanced analytics"
- *   ]}
- *   buttonText="Start Free Trial"
- *   isPopular
- *   popularText="Most Popular"
- *   highlightColor="blue"
- *   onButtonClick={() => console.log("Pro plan selected")}
- * />
- * 
- * @example
- * // Enterprise/Contact plan
- * <PricingCard
- *   name="Enterprise"
- *   price={<span className="text-2xl">Custom</span>}
- *   description="For large organizations"
- *   features={[
- *     "Unlimited everything",
- *     "Dedicated support",
- *     "Custom integrations",
- *     "SLA guarantee"
- *   ]}
- *   buttonText="Contact Sales"
- *   buttonVariant="outline"
- *   buttonHref="/contact"
- * />
  */
 export function PricingCard({
   name,
@@ -115,59 +72,59 @@ export function PricingCard({
   isPopular = false,
   popularText = "Popular",
   buttonVariant,
-  highlightColor = "red",
+  highlightColor = "primary",
+  as = "h3",
+  className,
+  ...props
 }: PricingCardProps) {
-  const colors = highlightColors[highlightColor];
-  
-  // Determine button variant
-  const variant = buttonVariant || (isPopular ? "solid" : "outline");
-  const colorScheme = isPopular ? colors.button : "gray";
+  const Heading = as;
+  const highlight = highlightStyles[highlightColor];
+  const resolvedButtonVariant = buttonVariant ?? (isPopular ? "default" : "outline");
 
   return (
     <div
-      className={`bg-white p-8 rounded-xl shadow-sm relative transition-all hover:shadow-md ${
-        isPopular ? `border-2 ${colors.border}` : "border border-gray-200"
-      }`}
-    >
-      {/* Popular Badge */}
-      {isPopular && (
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-          <span className={`${colors.badge} text-white px-4 py-1 rounded-full text-sm font-medium shadow-lg`}>
-            {popularText}
-          </span>
-        </div>
+      className={cn(
+        "relative rounded-xl bg-card p-8 shadow-sm transition-all hover:shadow-md",
+        isPopular ? cn("border-2", highlight.border) : "border border-border",
+        className
       )}
-
-      {/* Plan Name */}
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">{name}</h3>
-
-      {/* Description */}
-      {description && <p className="text-sm text-gray-600 mb-4">{description}</p>}
-
-      {/* Price */}
-      <div className="mb-6">
-        <div className="text-3xl font-bold text-gray-900">
-          {typeof price === "string" ? price : price}
+      {...props}
+    >
+      {isPopular ? (
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+          <Badge variant={highlight.badgeVariant} className="shadow-lg">
+            {popularText}
+          </Badge>
         </div>
-        {priceDescription && (
-          <p className="text-sm text-gray-500 mt-1">{priceDescription}</p>
-        )}
+      ) : null}
+
+      <Heading className="mb-2 text-xl font-semibold text-card-foreground">{name}</Heading>
+
+      {description ? (
+        <p className="mb-4 text-sm text-muted-foreground">{description}</p>
+      ) : null}
+
+      <div className="mb-6">
+        <div className="text-3xl font-bold text-card-foreground">{price}</div>
+        {priceDescription ? (
+          <p className="mt-1 text-sm text-muted-foreground">{priceDescription}</p>
+        ) : null}
       </div>
 
-      {/* Features */}
-      <ul className="space-y-3 mb-8">
+      <ul className="mb-8 space-y-3">
         {features.map((feature, index) => (
-          <li key={index} className="flex items-start">
-            <CheckCircle className="w-5 h-5 text-green-500 mr-3 shrink-0 mt-0.5" />
-            <span className="text-gray-700">{feature}</span>
+          <li key={`${feature}-${index}`} className="flex items-start">
+            <CheckCircle
+              className="mr-3 mt-0.5 h-5 w-5 shrink-0 text-success"
+              aria-hidden="true"
+            />
+            <span className="text-foreground">{feature}</span>
           </li>
         ))}
       </ul>
 
-      {/* CTA Button */}
       <Button
-        variant={variant}
-        colorScheme={colorScheme}
+        variant={resolvedButtonVariant}
         fullWidth
         onClick={onButtonClick}
         href={buttonHref}

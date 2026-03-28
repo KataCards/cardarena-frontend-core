@@ -1,5 +1,10 @@
-// components/composed/Pricing.tsx
+import * as React from "react";
 import { PricingCard } from "@/components/composed/display/PricingCard";
+import { cn } from "@/lib/utils";
+
+type PricingHeading = "h1" | "h2" | "h3" | "h4";
+type PricingVariant = "muted" | "base" | "surface";
+type PricingMaxWidth = "xl" | "2xl" | "5xl" | "7xl" | "full";
 
 export interface PricingPlan {
   name: string;
@@ -10,76 +15,92 @@ export interface PricingPlan {
   isContact?: boolean;
 }
 
-interface PricingProps {
+interface PricingProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
   /** Array of pricing plans to display */
-  plans: PricingPlan[];
+  plans: readonly PricingPlan[];
   /** Main heading text for the pricing section */
-  title?: string;
+  title?: React.ReactNode;
   /** Supporting description text below the title */
-  description?: string;
-  /** Background color variant */
-  variant?: "light" | "white" | "dark";
+  description?: React.ReactNode;
+  /** Semantic heading level. @default "h2" */
+  as?: PricingHeading;
+  /** Surface variant */
+  variant?: PricingVariant;
+  /** Width constraint for the section content. @default "7xl" */
+  maxWidth?: PricingMaxWidth;
 }
+
+const variantStyles = {
+  muted: {
+    section: "bg-muted/30",
+    title: "text-foreground",
+    description: "text-muted-foreground",
+  },
+  base: {
+    section: "bg-background",
+    title: "text-foreground",
+    description: "text-muted-foreground",
+  },
+  surface: {
+    section: "bg-card",
+    title: "text-card-foreground",
+    description: "text-muted-foreground",
+  },
+} as const;
+
+const maxWidthStyles: Record<PricingMaxWidth, string> = {
+  xl: "max-w-6xl",
+  "2xl": "max-w-screen-2xl",
+  "5xl": "max-w-5xl",
+  "7xl": "max-w-7xl",
+  full: "max-w-full",
+};
 
 /**
  * Pricing Section
- * 
+ *
  * Displays a responsive grid of pricing plans with customizable heading and styling.
  * Automatically adapts from single column on mobile to three columns on desktop.
- * 
- * @example
- * // Basic usage with default styling
- * <Pricing plans={pricingPlans} />
- * 
- * @example
- * // Custom heading and description
- * <Pricing 
- *   plans={plans}
- *   title="Choose Your Plan"
- *   description="Flexible pricing for teams of all sizes"
- * />
- * 
- * @example
- * // Dark variant for light-themed pages
- * <Pricing 
- *   plans={plans}
- *   variant="dark"
- *   title="Simple, Transparent Pricing"
- *   description="No hidden fees. Cancel anytime."
- * />
  */
-export function Pricing({ 
+export function Pricing({
   plans,
   title = "Simple Pricing",
   description = "Choose the plan that fits your needs",
-  variant = "light",
+  as = "h2",
+  variant = "muted",
+  maxWidth = "7xl",
+  className,
+  ...props
 }: PricingProps) {
-  const variants = {
-    light: "bg-gray-50",
-    white: "bg-white",
-    dark: "bg-slate-900",
-  };
-
-  const textColors = {
-    light: { title: "text-gray-900", description: "text-gray-600" },
-    white: { title: "text-gray-900", description: "text-gray-600" },
-    dark: { title: "text-white", description: "text-slate-300" },
-  };
-
-  const colors = textColors[variant];
+  const Heading = as;
+  const titleId = React.useId();
+  const styles = variantStyles[variant];
+  const isPlainDescription =
+    typeof description === "string" || typeof description === "number";
 
   return (
-    <section className={`py-20 ${variants[variant]}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="text-center mb-16">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${colors.title}`}>
+    <section
+      aria-labelledby={titleId}
+      className={cn("py-20", styles.section, className)}
+      {...props}
+    >
+      <div className={cn("mx-auto px-4 sm:px-6 lg:px-8", maxWidthStyles[maxWidth])}>
+        <header className="mb-16 text-center">
+          <Heading
+            id={titleId}
+            className={cn("mb-4 text-3xl font-bold md:text-4xl", styles.title)}
+          >
             {title}
-          </h2>
-          <p className={`text-xl ${colors.description}`}>
-            {description}
-          </p>
+          </Heading>
+          {description ? (
+            isPlainDescription ? (
+              <p className={cn("text-xl", styles.description)}>{description}</p>
+            ) : (
+              <div className={cn("text-xl", styles.description)}>{description}</div>
+            )
+          ) : null}
         </header>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {plans.map((plan, index) => (
             <PricingCard key={plan.name || index} {...plan} />
           ))}

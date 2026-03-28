@@ -1,6 +1,9 @@
-import React from "react";
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-export interface StatCardProps {
+type StatCardHeading = "h2" | "h3" | "h4" | "h5" | "h6";
+
+export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Stat title/label */
   title: string;
   /** Stat value to display */
@@ -12,69 +15,37 @@ export interface StatCardProps {
   /** Error message if stat failed to load */
   error?: string | null;
   /** Icon color variant */
-  iconColor?: "red" | "blue" | "green" | "purple" | "gray";
+  iconColor?: "primary" | "info" | "success" | "secondary" | "muted";
   /** Card background variant */
-  variant?: "gray" | "white" | "gradient";
+  variant?: "muted" | "base" | "surface";
   /** Optional trend indicator */
   trend?: {
     value: number;
     label?: string;
   };
+  /** Semantic heading level for the title. @default "h3" */
+  as?: StatCardHeading;
 }
 
 const iconColors = {
-  red: "text-red-600",
-  blue: "text-blue-600",
-  green: "text-green-600",
-  purple: "text-purple-600",
-  gray: "text-gray-600",
-};
+  primary: "text-primary",
+  info: "text-info",
+  success: "text-success",
+  secondary: "text-secondary",
+  muted: "text-muted-foreground",
+} as const;
 
 const variants = {
-  gray: "bg-gray-50",
-  white: "bg-white border border-gray-200",
-  gradient: "bg-linear-to-br from-white to-gray-50",
-};
+  muted: "bg-muted/30 border border-border",
+  base: "bg-background border border-border",
+  surface: "bg-card border border-border",
+} as const;
 
 /**
  * StatCard
- * 
+ *
  * A card component for displaying statistics with icons, loading states,
  * and optional trend indicators.
- * 
- * @example
- * // Basic usage
- * import { Users } from "lucide-react";
- * 
- * <StatCard
- *   title="Total Users"
- *   value={1234}
- *   icon={Users}
- * />
- * 
- * @example
- * // With loading and error states
- * import { DollarSign, TrendingUp } from "lucide-react";
- * 
- * <StatCard
- *   title="Revenue"
- *   value="$45,231"
- *   icon={DollarSign}
- *   iconColor="green"
- *   isLoading={isLoading}
- *   error={error}
- * />
- * 
- * @example
- * // With trend indicator
- * <StatCard
- *   title="Active Sessions"
- *   value={892}
- *   icon={TrendingUp}
- *   iconColor="blue"
- *   variant="white"
- *   trend={{ value: 12.5, label: "vs last week" }}
- * />
  */
 export function StatCard({
   title,
@@ -82,37 +53,52 @@ export function StatCard({
   icon: Icon,
   isLoading = false,
   error = null,
-  iconColor = "red",
-  variant = "gray",
+  iconColor = "primary",
+  variant = "muted",
   trend,
+  as = "h3",
+  className,
+  ...props
 }: StatCardProps) {
+  const Heading = as;
+
   return (
-    <div className={`${variants[variant]} p-6 rounded-lg shadow-sm hover:shadow-md transition-all`}>
-      <div className={`flex items-center ${iconColors[iconColor]} mb-2`}>
-        <Icon className="w-6 h-6" />
-        <h3 className="ml-2 text-lg font-semibold text-gray-700">{title}</h3>
+    <div
+      className={cn(
+        "rounded-lg p-6 shadow-sm transition-all hover:shadow-md",
+        variants[variant],
+        className
+      )}
+      {...props}
+    >
+      <div className={cn("mb-2 flex items-center", iconColors[iconColor])}>
+        <Icon className="h-6 w-6" aria-hidden="true" />
+        <Heading className="ml-2 text-lg font-semibold text-foreground">{title}</Heading>
       </div>
-      
+
       {isLoading ? (
-        <p className="text-3xl font-bold text-gray-500 animate-pulse">...</p>
+        <p className="animate-pulse text-3xl font-bold text-muted-foreground">...</p>
       ) : error ? (
-        <p className="text-sm text-red-500">{error}</p>
+        <p className="text-sm text-destructive">{error}</p>
       ) : (
         <>
-          <p className="text-3xl font-bold text-gray-800">{value}</p>
-          {trend && (
+          <p className="text-3xl font-bold text-foreground">{value}</p>
+          {trend ? (
             <div className="mt-2 flex items-center gap-1">
               <span
-                className={`text-sm font-semibold ${
-                  trend.value >= 0 ? "text-green-600" : "text-red-600"
-                }`}
+                className={cn(
+                  "text-sm font-semibold",
+                  trend.value >= 0 ? "text-success" : "text-destructive"
+                )}
               >
                 {trend.value >= 0 ? "+" : ""}
                 {trend.value}%
               </span>
-              {trend.label && <span className="text-xs text-gray-500">{trend.label}</span>}
+              {trend.label ? (
+                <span className="text-xs text-muted-foreground">{trend.label}</span>
+              ) : null}
             </div>
-          )}
+          ) : null}
         </>
       )}
     </div>

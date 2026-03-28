@@ -1,8 +1,13 @@
 "use client";
 
+import * as React from "react";
 import { LogOut } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
+
+type SidebarBrandTag = "div" | "span" | "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
 export interface SidebarLink {
   /** Link label text */
@@ -22,10 +27,10 @@ export interface SidebarProps {
   brand: {
     /** Brand name */
     name: string;
-    /** Optional logo/icon component */
-    logo?: React.ComponentType<{ className?: string }>;
-    /** Optional custom logo element */
-    logoElement?: ReactNode;
+    /** Optional heading/element level for the brand label. @default "span" */
+    as?: SidebarBrandTag;
+    /** Optional logo element */
+    logo?: React.ReactNode;
     /** Optional brand link destination */
     href?: string;
   };
@@ -38,7 +43,7 @@ export interface SidebarProps {
     /** Optional user email or subtitle */
     subtitle?: string;
     /** Optional avatar URL or element */
-    avatar?: string | ReactNode;
+    avatar?: string | React.ReactNode;
   };
   /** Optional logout handler */
   onLogout?: () => void;
@@ -55,61 +60,25 @@ export interface SidebarProps {
   /** Whether sidebar should be sticky */
   sticky?: boolean;
   /** Optional footer content */
-  footer?: ReactNode;
+  footer?: React.ReactNode;
+  /** Accessible label for the aside landmark */
+  asideLabel?: string;
+  /** Accessible label for the navigation landmark */
+  navLabel?: string;
 }
 
 const widths = {
   sm: "w-64",
   md: "w-72",
   lg: "w-80",
-};
+} as const;
 
 /**
  * Sidebar
- * 
+ *
  * A flexible navigation sidebar for application layouts.
  * Supports branding, navigation links, user info, and logout functionality.
- * 
- * @example
- * // Basic usage
- * import { Home, Settings, Users } from "lucide-react";
- * 
- * <Sidebar
- *   brand={{ name: "MyApp", logo: Trophy }}
- *   links={[
- *     { label: "Dashboard", href: "/dashboard", icon: Home, isActive: true },
- *     { label: "Users", href: "/users", icon: Users },
- *     { label: "Settings", href: "/settings", icon: Settings }
- *   ]}
- * />
- * 
- * @example
- * // With user and logout
- * <Sidebar
- *   brand={{ name: "CardArena", logo: Trophy, href: "/" }}
- *   links={navLinks}
- *   user={{
- *     name: "John Doe",
- *     subtitle: "john@example.com",
- *     avatar: "/avatar.jpg"
- *   }}
- *   onLogout={handleLogout}
- *   isLoggingOut={isLoading}
- *   logoutText="Sign Out"
- *   logoutLoadingText="Signing out..."
- * />
- * 
- * @example
- * // With badges and custom width
- * <Sidebar
- *   width="lg"
- *   brand={{ name: "Dashboard" }}
- *   links={[
- *     { label: "Messages", href: "/messages", icon: Mail, badge: 5 },
- *     { label: "Notifications", href: "/notifications", icon: Bell, badge: "New" }
- *   ]}
- *   footer={<div className="text-xs text-gray-500">v1.0.0</div>}
- * />
+ * Uses semantic color tokens for full theme compatibility.
  */
 export function Sidebar({
   brand,
@@ -123,108 +92,134 @@ export function Sidebar({
   width = "md",
   sticky = true,
   footer,
+  asideLabel,
+  navLabel,
 }: SidebarProps) {
-  const BrandLogo = brand.logo;
+  const BrandName = brand.as ?? "span";
+  const resolvedAsideLabel = asideLabel ?? `${brand.name} sidebar`;
+  const resolvedNavLabel = navLabel ?? `${brand.name} navigation`;
 
   const brandContent = (
-    <div className="flex items-center gap-3 group">
-      {brand.logoElement ? (
-        brand.logoElement
-      ) : BrandLogo ? (
-        <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-200 group-hover:rotate-6 transition-transform">
-          <BrandLogo className="w-6 h-6 text-white" />
-        </div>
-      ) : null}
-      <span className="text-2xl font-black text-black tracking-tighter uppercase">
+    <div className="group flex items-center gap-3">
+      {brand.logo ? brand.logo : null}
+      <BrandName className="text-2xl font-black uppercase tracking-tighter text-foreground">
         {brand.name}
-      </span>
+      </BrandName>
     </div>
   );
 
   return (
     <aside
-      className={`hidden md:flex md:flex-col ${widths[width]} bg-white border-r border-gray-100 shadow-sm h-screen ${sticky ? "sticky top-0" : ""} transition-all duration-300`}
+      aria-label={resolvedAsideLabel}
+      className={cn(
+        "hidden h-screen bg-background shadow-sm transition-all duration-300 md:flex md:flex-col",
+        widths[width],
+        sticky && "sticky top-0",
+        "border-r border-border"
+      )}
     >
-      {/* Brand Header */}
       <div className="p-8">
-        {brand.href ? <Link href={brand.href}>{brandContent}</Link> : brandContent}
+        {brand.href ? (
+          <Link
+            href={brand.href}
+            className="rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            {brandContent}
+          </Link>
+        ) : (
+          brandContent
+        )}
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
+      <nav aria-label={resolvedNavLabel} className="flex-1 space-y-2 overflow-y-auto px-4">
         {links.map((link) => {
           const Icon = link.icon;
           const isActive = link.isActive;
+          const hasBadge = link.badge !== undefined && link.badge !== null;
 
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all duration-200 group
-                ${
-                  isActive
-                    ? "bg-red-50 text-red-600 shadow-sm"
-                    : "text-gray-400 hover:bg-gray-50 hover:text-gray-900"
-                }`}
-            >
-              {Icon && (
-                <Icon
-                  className={`w-5 h-5 ${isActive ? "text-red-600" : "text-gray-400 group-hover:text-gray-900"} transition-colors`}
-                />
+              className={cn(
+                "group flex items-center gap-3 rounded-xl px-4 py-3 font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                isActive
+                  ? "bg-primary/10 text-primary shadow-sm"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
-              <span className="text-sm tracking-tight flex-1">{link.label}</span>
-              {link.badge && (
-                <span className="px-2 py-0.5 text-xs font-bold bg-red-600 text-white rounded-full">
+            >
+              {Icon ? (
+                <Icon
+                  className={cn(
+                    "h-5 w-5 transition-colors",
+                    isActive ? "text-primary" : "text-muted-foreground group-hover:text-accent-foreground"
+                  )}
+                  aria-hidden="true"
+                />
+              ) : null}
+              <span className="flex-1 text-sm tracking-tight">{link.label}</span>
+              {hasBadge ? (
+                <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-bold text-primary-foreground">
                   {link.badge}
                 </span>
-              )}
-              {isActive && (
-                <div className="w-1.5 h-1.5 rounded-full bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)]" />
-              )}
+              ) : null}
+              {isActive ? (
+                <div
+                  className="h-1.5 w-1.5 rounded-full bg-primary shadow-primary-glow"
+                  aria-hidden="true"
+                />
+              ) : null}
             </Link>
           );
         })}
       </nav>
 
-      {/* User / Logout Section */}
-      <div className="p-6 border-t border-gray-50">
-        {user && (
-          <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-gray-50/50 border border-gray-100/50">
+      <div className="border-t border-border p-6">
+        {user ? (
+          <div className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-muted/50 px-4 py-3">
             {typeof user.avatar === "string" ? (
-              <img
+              <Image
                 src={user.avatar}
                 alt={user.name}
-                className="w-8 h-8 rounded-full border-2 border-white shadow-sm object-cover"
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-full border-2 border-background object-cover shadow-sm"
               />
             ) : user.avatar ? (
               user.avatar
             ) : (
-              <div className="w-8 h-8 rounded-full bg-linear-to-br from-gray-200 to-gray-300 border-2 border-white shadow-sm" />
+              <div
+                className="h-8 w-8 rounded-full border-2 border-background bg-linear-to-br from-muted to-muted-foreground/20 shadow-sm"
+                aria-hidden="true"
+              />
             )}
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">
                 {userLabel}
               </p>
-              <p className="text-sm font-bold text-gray-900 truncate">{user.name}</p>
-              {user.subtitle && (
-                <p className="text-xs text-gray-500 truncate">{user.subtitle}</p>
-              )}
+              <p className="truncate text-sm font-bold text-foreground">{user.name}</p>
+              {user.subtitle ? (
+                <p className="truncate text-xs text-muted-foreground">{user.subtitle}</p>
+              ) : null}
             </div>
           </div>
-        )}
+        ) : null}
 
-        {onLogout && (
-          <button
+        {onLogout ? (
+          <Button
+            type="button"
             onClick={onLogout}
             disabled={isLoggingOut}
-            className="w-full flex items-center justify-center gap-2 bg-black text-white rounded-xl py-3.5 text-sm font-black uppercase tracking-widest hover:bg-red-600 hover:shadow-lg hover:shadow-red-200 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-300 active:scale-[0.98]"
+            fullWidth
+            variant="default"
+            icon={LogOut}
+            className="rounded-xl py-3.5 text-sm font-black uppercase tracking-widest transition-all duration-300 active:scale-[0.98]"
           >
-            <LogOut className={`w-5 h-5 ${isLoggingOut ? "animate-pulse" : ""}`} />
-            <span>{isLoggingOut ? logoutLoadingText : logoutText}</span>
-          </button>
-        )}
+            {isLoggingOut ? logoutLoadingText : logoutText}
+          </Button>
+        ) : null}
 
-        {footer && <div className="mt-4">{footer}</div>}
+        {footer ? <div className="mt-4">{footer}</div> : null}
       </div>
     </aside>
   );

@@ -1,5 +1,9 @@
+import * as React from "react";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { Badge } from "@/components/ui/Badge";
+import { cn } from "@/lib/utils";
+
+type TournamentCardHeading = "h2" | "h3" | "h4" | "h5" | "h6";
 
 export interface TournamentCardMetaItem {
   /** Icon component to display */
@@ -25,76 +29,28 @@ export interface TournamentCardProps {
   /** Call-to-action text */
   ctaText?: string;
   /** Optional footer content (overrides CTA) */
-  footer?: ReactNode;
+  footer?: React.ReactNode;
   /** Minimum card width */
   minWidth?: string;
+  /** Additional CSS classes */
+  className?: string;
+  /** Semantic heading level for the title. @default "h3" */
+  as?: TournamentCardHeading;
 }
 
 const badgeVariants = {
-  success: "bg-green-100 text-green-800 border-green-200",
-  info: "bg-blue-100 text-blue-800 border-blue-200",
-  warning: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  danger: "bg-red-100 text-red-800 border-red-200",
-  neutral: "bg-gray-100 text-gray-800 border-gray-200",
-};
+  success: "success",
+  info: "info",
+  warning: "warning",
+  danger: "destructive",
+  neutral: "outline",
+} as const;
 
 /**
  * TournamentCard
- * 
+ *
  * A flexible card component for displaying event/tournament information with
- * metadata, status badges, and call-to-action links. Can be used for any
- * event-based content.
- * 
- * @example
- * // Basic tournament card
- * import { MapPin, Calendar, Users, Gamepad2 } from "lucide-react";
- * 
- * <TournamentCard
- *   title="Summer Championship 2024"
- *   badge={{ label: "Registration Open", variant: "info" }}
- *   metadata={[
- *     { icon: MapPin, label: "New York, NY" },
- *     { icon: Calendar, label: "July 15, 2024" },
- *     { icon: Users, label: "24/32 Players" },
- *     { icon: Gamepad2, label: "Magic: The Gathering" }
- *   ]}
- *   href="/tournaments/summer-2024"
- *   ctaText="View Details"
- * />
- * 
- * @example
- * // Event card with custom footer
- * import { MapPin, Calendar, DollarSign } from "lucide-react";
- * 
- * <TournamentCard
- *   title="Tech Conference 2024"
- *   badge={{ label: "Sold Out", variant: "danger" }}
- *   metadata={[
- *     { icon: MapPin, label: "San Francisco, CA" },
- *     { icon: Calendar, label: "Aug 20-22, 2024" },
- *     { icon: DollarSign, label: "$299" }
- *   ]}
- *   footer={
- *     <button className="text-sm text-blue-600 font-semibold">
- *       Join Waitlist
- *     </button>
- *   }
- * />
- * 
- * @example
- * // Interactive card with onClick
- * <TournamentCard
- *   title="Weekly Game Night"
- *   badge={{ label: "Tonight", variant: "success" }}
- *   metadata={[
- *     { icon: MapPin, label: "Local Game Store" },
- *     { icon: Calendar, label: "Every Friday 7PM" },
- *     { icon: Users, label: "8-12 Players" }
- *   ]}
- *   onClick={() => console.log("Card clicked")}
- *   ctaText="RSVP Now →"
- *   minWidth="350px"
- * />
+ * metadata, status badges, and call-to-action links.
  */
 export function TournamentCard({
   title,
@@ -105,47 +61,51 @@ export function TournamentCard({
   ctaText = "View Details →",
   footer,
   minWidth = "300px",
+  className,
+  as = "h3",
 }: TournamentCardProps) {
+  const Heading = as;
+
   const cardContent = (
     <div
-      className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group-active:scale-[0.98] h-full flex flex-col"
+      className={cn(
+        "flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group-active:scale-[0.98]",
+        className
+      )}
       style={{ minWidth }}
     >
-      {/* Header */}
-      <div className="flex justify-between items-start mb-4 gap-4">
-        <h3 className="text-xl font-bold text-black tracking-tight leading-tight truncate">
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <Heading className="truncate text-xl font-bold leading-tight tracking-tight text-card-foreground">
           {title}
-        </h3>
-        {badge && (
-          <span
-            className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest border shrink-0 ${
-              badgeVariants[badge.variant || "neutral"]
-            }`}
+        </Heading>
+        {badge ? (
+          <Badge
+            variant={badgeVariants[badge.variant || "neutral"]}
+            size="sm"
+            className="shrink-0 text-[10px] font-black uppercase tracking-widest"
           >
             {badge.label}
-          </span>
-        )}
+          </Badge>
+        ) : null}
       </div>
 
-      {/* Metadata */}
-      <div className="space-y-3 flex-1">
-        {metadata.map((item, index) => {
+      <div className="flex-1 space-y-3">
+        {metadata.map((item) => {
           const Icon = item.icon;
           return (
-            <div key={index} className="flex items-center text-gray-500 text-sm font-medium">
-              <Icon className="w-4 h-4 mr-2 text-gray-400 shrink-0" />
+            <div key={item.label} className="flex items-center text-sm font-medium text-muted-foreground">
+              <Icon className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
               <span className="truncate">{item.label}</span>
             </div>
           );
         })}
       </div>
 
-      {/* Footer */}
-      <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-end">
+      <div className="mt-6 flex items-center justify-end border-t border-border/70 pt-4">
         {footer ? (
           footer
         ) : (
-          <span className="text-xs font-black uppercase tracking-tighter text-red-600 group-hover:translate-x-1 transition-transform">
+          <span className="text-xs font-black uppercase tracking-tighter text-primary transition-transform group-hover:translate-x-1">
             {ctaText}
           </span>
         )}
@@ -155,7 +115,7 @@ export function TournamentCard({
 
   if (href) {
     return (
-      <Link href={href} className="block h-full group">
+      <Link href={href} className="group block h-full">
         {cardContent}
       </Link>
     );
@@ -163,7 +123,7 @@ export function TournamentCard({
 
   if (onClick) {
     return (
-      <button onClick={onClick} className="block h-full group text-left w-full">
+      <button onClick={onClick} className="group block h-full w-full text-left">
         {cardContent}
       </button>
     );

@@ -1,28 +1,42 @@
-import React from "react";
-import { AlertCircle, CheckCircle, LucideIcon } from "lucide-react";
+import * as React from "react";
+import { CheckCircle, LucideIcon } from "lucide-react";
+import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { cn } from "@/lib/utils";
 
-interface TabSectionProps {
+type TabSectionHeading = "h1" | "h2" | "h3" | "h4";
+type TabSectionMaxWidth = "sm" | "md" | "lg" | "xl" | "2xl" | "full";
+
+interface TabSectionProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   /** The main heading for the section */
-  title: string;
+  title: React.ReactNode;
   /** Optional descriptive text below the title */
-  description?: string;
+  description?: React.ReactNode;
   /** Optional Lucide icon to display next to the title */
   icon?: LucideIcon;
   /** Error message to display in an alert banner */
-  error?: string | null;
-  /** Success message to display in an alert banner */
-  success?: string | null;
+  error?: React.ReactNode;
+  /** Success message to display in a status banner */
+  success?: React.ReactNode;
   /** The content of the section (typically form fields or info lists) */
   children: React.ReactNode;
-  /** Tailwind max-width class (defaults to max-w-2xl) */
-  maxWidth?: string;
-  /** Additional Tailwind classes for the container */
-  className?: string;
+  /** Semantic heading level. @default "h2" */
+  as?: TabSectionHeading;
+  /** Semantic width constraint. @default "lg" */
+  maxWidth?: TabSectionMaxWidth;
 }
+
+const maxWidthStyles: Record<TabSectionMaxWidth, string> = {
+  sm: "max-w-screen-sm",
+  md: "max-w-screen-md",
+  lg: "max-w-2xl",
+  xl: "max-w-4xl",
+  "2xl": "max-w-6xl",
+  full: "max-w-full",
+};
 
 /**
  * TabSection
- * 
+ *
  * A structural container used within tab-based views to group related content.
  * Provides consistent layout for titles, icons, descriptions, and status banners.
  */
@@ -33,34 +47,49 @@ export function TabSection({
   error,
   success,
   children,
-  maxWidth = "max-w-2xl",
-  className = "",
+  as = "h2",
+  maxWidth = "lg",
+  className,
+  ...props
 }: TabSectionProps) {
+  const Heading = as;
+  const isPlainDescription =
+    typeof description === "string" || typeof description === "number";
+
   return (
-    <div className={`${maxWidth} ${className}`}>
+    <section className={cn(maxWidthStyles[maxWidth], className)} {...props}>
       <div className="mb-6">
-        <div className="flex items-center mb-2">
-          {Icon && <Icon className="w-6 h-6 text-red-600 mr-3" />}
-          <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+        <div className="mb-2 flex items-center">
+          {Icon ? <Icon className="mr-3 h-6 w-6 text-primary" aria-hidden="true" /> : null}
+          <Heading className="text-2xl font-bold text-foreground">{title}</Heading>
         </div>
-        {description && <p className="text-gray-600">{description}</p>}
+        {description ? (
+          isPlainDescription ? (
+            <p className="text-muted-foreground">{description}</p>
+          ) : (
+            <div className="text-muted-foreground">{description}</div>
+          )
+        ) : null}
       </div>
 
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center">
-          <AlertCircle className="w-5 h-5 text-red-600 mr-3" />
-          <span className="text-red-700">{error}</span>
-        </div>
-      )}
+      {error ? (
+        <ErrorAlert.Root className="mb-6">
+          <ErrorAlert.Description>{error}</ErrorAlert.Description>
+        </ErrorAlert.Root>
+      ) : null}
 
-      {success && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center">
-          <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
-          <span className="text-green-700">{success}</span>
+      {success ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-6 flex items-center rounded-lg border border-success/20 bg-success/10 p-4 text-success"
+        >
+          <CheckCircle className="mr-3 h-5 w-5 shrink-0" aria-hidden="true" />
+          <span>{success}</span>
         </div>
-      )}
+      ) : null}
 
       {children}
-    </div>
+    </section>
   );
 }

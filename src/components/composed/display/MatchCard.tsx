@@ -1,5 +1,9 @@
-import type { BracketMatch } from "@/types/ui/bracket";
+import * as React from "react";
+import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
+import type { BracketMatch } from "@/types/ui/bracket";
+
+type MatchCardHeading = "h3" | "h4" | "h5" | "h6";
 
 /**
  * Props for the MatchCard component.
@@ -13,51 +17,89 @@ export interface MatchCardProps {
   onClick?: (id: string) => void;
   /** Additional CSS classes */
   className?: string;
+  /** Semantic heading level for the round label. @default "h4" */
+  as?: MatchCardHeading;
+}
+
+function handleKeyDown(
+  event: React.KeyboardEvent<HTMLDivElement>,
+  matchId: string,
+  onClick?: (id: string) => void
+) {
+  if (!onClick) {
+    return;
+  }
+
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    onClick(matchId);
+  }
 }
 
 /**
  * MatchCard
- * 
+ *
  * A clean, stateless card representing a single tournament match.
  * Displays match details including table number, round, players, and winner status.
  */
-export function MatchCard({ 
-  match, 
-  variant = "default", 
-  onClick, 
-  className = "" 
+export function MatchCard({
+  match,
+  variant = "default",
+  onClick,
+  className,
+  as = "h4",
 }: MatchCardProps) {
-  const isComplete = match.status === 'completed' || !!match.winner;
+  const Heading = as;
+  const isComplete = match.status === "completed" || Boolean(match.winner);
+  const winnerName = match.winner ?? match.players.find((player) => player.isWinner)?.name;
+  const interactiveProps = onClick
+    ? {
+        role: "button" as const,
+        tabIndex: 0,
+        onClick: () => onClick(match.id),
+        onKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) =>
+          handleKeyDown(event, match.id, onClick),
+      }
+    : {};
 
   if (variant === "compact") {
     return (
       <div
         className={cn(
-          "bg-white/80 backdrop-blur-sm p-3 rounded-lg border transition-all duration-200 shadow-xs hover:shadow-md",
-          isComplete ? 'border-green-100 bg-green-50/50' : 'border-gray-100',
-          onClick && 'cursor-pointer active:scale-[0.98]',
+          "rounded-lg border p-3 shadow-sm transition-all duration-200",
+          isComplete ? "border-success/30 bg-success/10" : "border-border bg-card",
+          onClick && "cursor-pointer active:scale-[0.98]",
           className
         )}
-        onClick={() => onClick?.(match.id)}
+        {...interactiveProps}
       >
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-[10px] font-black uppercase tracking-tighter text-gray-400">
+        <div className="mb-2 flex items-center justify-between">
+          <span className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground">
             T{match.tableNumber} • R{match.round}
           </span>
-          {isComplete && <span className="text-[10px]">🏆</span>}
+          {isComplete ? (
+            <span role="img" aria-label="Winner selected" className="text-[10px]">
+              🏆
+            </span>
+          ) : null}
         </div>
 
         <div className="space-y-1">
-          {match.players.map((player, idx) => (
-            <div key={idx} className="flex items-center justify-between">
-              <span className={cn(
-                "text-sm font-bold truncate max-w-[100px]",
-                match.winner === player ? "text-green-700" : "text-gray-900"
-              )}>
-                {player}
-              </span>
-            </div>
-          ))}
+          {match.players.map((player) => {
+            const isWinner = player.name === winnerName;
+            return (
+              <div key={player.name} className="flex items-center justify-between">
+                <span
+                  className={cn(
+                    "max-w-[100px] truncate text-sm font-bold",
+                    isWinner ? "text-success" : "text-foreground"
+                  )}
+                >
+                  {player.name}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -66,46 +108,60 @@ export function MatchCard({
   return (
     <div
       className={cn(
-        "bg-white/80 backdrop-blur-sm p-5 rounded-xl border transition-all duration-300 shadow-sm",
-        isComplete ? 'border-green-100 bg-green-50/50' : 'border-gray-200 hover:border-red-400/50 hover:bg-white',
-        onClick && 'cursor-pointer hover:shadow-md active:scale-[0.98]',
+        "rounded-xl border p-5 shadow-sm transition-all duration-300",
+        isComplete
+          ? "border-success/30 bg-success/10"
+          : "border-border bg-card hover:border-primary/40 hover:shadow-md",
+        onClick && "cursor-pointer active:scale-[0.98]",
         className
       )}
-      onClick={() => onClick?.(match.id)}
+      {...interactiveProps}
     >
-      <div className="flex justify-between items-center mb-4">
-        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">
+      <div className="mb-4 flex items-center justify-between">
+        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Table {match.tableNumber}
         </span>
-        <span className={cn(
-          "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border",
-          isComplete ? 'bg-green-100 border-green-200 text-green-700' : 'bg-gray-100 border-gray-200 text-gray-500'
-        )}>
-          {isComplete ? 'Completed' : 'Pending'}
-        </span>
+        <Badge variant={isComplete ? "success" : "outline"} size="sm">
+          {isComplete ? "Completed" : "Pending"}
+        </Badge>
       </div>
 
       <div className="space-y-1">
-        <h4 className="text-sm font-bold text-gray-500 uppercase tracking-tighter">Round {match.round}</h4>
+        <Heading className="text-sm font-bold uppercase tracking-tighter text-muted-foreground">
+          {match.round ? `Round ${match.round}` : "Match"}
+        </Heading>
         <div className="flex flex-col gap-1">
-          {match.players.map((player, idx) => (
-            <p key={idx} className={cn(
-              "text-lg font-bold tracking-tight",
-              match.winner === player ? 'text-green-600' : 'text-black'
-            )}>
-              {player}
-              {match.winner === player && <span className="ml-2">🏆</span>}
-            </p>
-          ))}
+          {match.players.map((player) => {
+            const isWinner = player.name === winnerName;
+
+            return (
+              <p
+                key={player.name}
+                className={cn(
+                  "text-lg font-bold tracking-tight",
+                  isWinner ? "text-success" : "text-foreground"
+                )}
+              >
+                {player.name}
+                {isWinner ? (
+                  <span role="img" aria-label="Winner" className="ml-2">
+                    🏆
+                  </span>
+                ) : null}
+              </p>
+            );
+          })}
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-100/50">
-        <p className={cn(
-          "text-xs font-bold uppercase tracking-widest",
-          isComplete ? 'text-green-600' : 'text-gray-400'
-        )}>
-          Winner: {match.winner ?? "Pending"}
+      <div className="mt-4 border-t border-border/70 pt-4">
+        <p
+          className={cn(
+            "text-xs font-bold uppercase tracking-widest",
+            isComplete ? "text-success" : "text-muted-foreground"
+          )}
+        >
+          Winner: {winnerName ?? "Pending"}
         </p>
       </div>
     </div>

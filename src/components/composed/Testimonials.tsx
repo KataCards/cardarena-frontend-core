@@ -1,5 +1,9 @@
-// components/composed/Testimonials.tsx
+import * as React from "react";
 import { TestimonialCard } from "@/components/composed/display/TestimonialCard";
+import { cn } from "@/lib/utils";
+
+type TestimonialsHeading = "h1" | "h2" | "h3" | "h4";
+type TestimonialsVariant = "muted" | "base" | "surface";
 
 export interface Testimonial {
   name: string;
@@ -8,78 +12,90 @@ export interface Testimonial {
   rating: number;
 }
 
-interface TestimonialsProps {
+interface TestimonialsProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
   /** Array of testimonial objects to display */
-  testimonials: Testimonial[];
+  testimonials: readonly Testimonial[];
   /** Main heading text for the testimonials section */
-  title?: string;
+  title?: React.ReactNode;
   /** Supporting description text below the title */
-  description?: string;
-  /** Background color variant for different page contexts */
-  variant?: "light" | "white" | "dark";
+  description?: React.ReactNode;
+  /** Semantic heading level. @default "h2" */
+  as?: TestimonialsHeading;
+  /** Surface variant */
+  variant?: TestimonialsVariant;
 }
+
+const variantStyles = {
+  muted: {
+    section: "bg-muted/30",
+    title: "text-foreground",
+    description: "text-muted-foreground",
+    cardVariant: "muted" as const,
+  },
+  base: {
+    section: "bg-background",
+    title: "text-foreground",
+    description: "text-muted-foreground",
+    cardVariant: "base" as const,
+  },
+  surface: {
+    section: "bg-card",
+    title: "text-card-foreground",
+    description: "text-muted-foreground",
+    cardVariant: "outlined" as const,
+  },
+} as const;
 
 /**
  * Testimonials Section
- * 
+ *
  * Displays a responsive grid of customer testimonials with ratings and user details.
  * Automatically adapts from single column on mobile to three columns on desktop.
- * 
- * @example
- * // Basic usage with default styling
- * <Testimonials testimonials={customerReviews} />
- * 
- * @example
- * // Custom heading and description
- * <Testimonials
- *   testimonials={reviews}
- *   title="Customer Success Stories"
- *   description="See why teams love our platform"
- * />
- * 
- * @example
- * // Dark variant for light-themed pages
- * <Testimonials
- *   testimonials={reviews}
- *   variant="dark"
- *   title="Trusted by Professionals"
- *   description="Join thousands of satisfied users worldwide"
- * />
  */
-export function Testimonials({ 
+export function Testimonials({
   testimonials,
   title = "What our customers say",
   description = "Trusted by thousands of satisfied users",
-  variant = "white",
+  as = "h2",
+  variant = "base",
+  className,
+  ...props
 }: TestimonialsProps) {
-  const variants = {
-    light: "bg-gray-50",
-    white: "bg-white",
-    dark: "bg-slate-900",
-  };
-
-  const textColors = {
-    light: { title: "text-gray-900", description: "text-gray-600" },
-    white: { title: "text-gray-900", description: "text-gray-600" },
-    dark: { title: "text-white", description: "text-slate-300" },
-  };
-
-  const colors = textColors[variant];
+  const Heading = as;
+  const titleId = React.useId();
+  const styles = variantStyles[variant];
+  const isPlainDescription =
+    typeof description === "string" || typeof description === "number";
 
   return (
-    <section className={`py-20 ${variants[variant]}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header className="text-center mb-16">
-          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${colors.title}`}>
+    <section
+      aria-labelledby={titleId}
+      className={cn("py-20", styles.section, className)}
+      {...props}
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <header className="mb-16 text-center">
+          <Heading
+            id={titleId}
+            className={cn("mb-4 text-3xl font-bold md:text-4xl", styles.title)}
+          >
             {title}
-          </h2>
-          <p className={`text-xl ${colors.description}`}>
-            {description}
-          </p>
+          </Heading>
+          {description ? (
+            isPlainDescription ? (
+              <p className={cn("text-xl", styles.description)}>{description}</p>
+            ) : (
+              <div className={cn("text-xl", styles.description)}>{description}</div>
+            )
+          ) : null}
         </header>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           {testimonials.map((testimonial, index) => (
-            <TestimonialCard key={testimonial.name || index} {...testimonial} />
+            <TestimonialCard
+              key={testimonial.name || index}
+              variant={styles.cardVariant}
+              {...testimonial}
+            />
           ))}
         </div>
       </div>

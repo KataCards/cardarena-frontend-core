@@ -1,11 +1,14 @@
-import React from "react";
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-export type BannerVariant = 'success' | 'warning' | 'info' | 'error' | 'neutral' | 'accent';
+export type BannerVariant = "success" | "warning" | "info" | "error" | "neutral" | "accent";
+
+type StatusBannerHeading = "h2" | "h3" | "h4" | "h5" | "h6";
 
 /**
  * Props for the StatusBanner component.
  */
-export interface StatusBannerProps {
+export interface StatusBannerProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Primary status display info */
   primaryStatus: {
     label: string;
@@ -19,6 +22,7 @@ export interface StatusBannerProps {
     statusLabel: string;
     icon: React.ComponentType<{ className?: string }>;
     animateIcon?: boolean;
+    formatValue?: (value: string | number) => React.ReactNode;
   };
   /** Secondary status display info (e.g., participants, capacity, slots) */
   secondaryStatus: {
@@ -35,77 +39,52 @@ export interface StatusBannerProps {
   }>;
   /** Overall visual style variant for the banner */
   variant: BannerVariant;
+  /** Semantic heading level for section labels. @default "h3" */
+  as?: StatusBannerHeading;
 }
 
-const variantStyles: Record<BannerVariant, string> = {
-  success: "border-green-500/50 bg-green-50/70 text-green-700",
-  warning: "border-orange-500/50 bg-orange-50/70 text-orange-700",
-  info: "border-blue-500/50 bg-blue-50/70 text-blue-700",
-  error: "border-red-500/50 bg-red-50/70 text-red-700",
-  neutral: "border-gray-500/50 bg-gray-50/70 text-gray-700",
-  accent: "border-red-500/50 bg-red-50/70 text-red-700",
-};
-
-const textVariantStyles: Record<BannerVariant, string> = {
-  success: "text-green-600",
-  warning: "text-orange-600",
-  info: "text-blue-600",
-  error: "text-red-600",
-  neutral: "text-gray-600",
-  accent: "text-red-600",
+const containerStyles: Record<
+  BannerVariant,
+  { shell: string; accent: string; chip: string }
+> = {
+  success: {
+    shell: "border-success/30 bg-success/10 text-success",
+    accent: "text-success",
+    chip: "border-success/20 bg-background/80 text-success",
+  },
+  warning: {
+    shell: "border-warning/30 bg-warning/10 text-warning",
+    accent: "text-warning",
+    chip: "border-warning/20 bg-background/80 text-warning",
+  },
+  info: {
+    shell: "border-info/30 bg-info/10 text-info",
+    accent: "text-info",
+    chip: "border-info/20 bg-background/80 text-info",
+  },
+  error: {
+    shell: "border-destructive/30 bg-destructive/10 text-destructive",
+    accent: "text-destructive",
+    chip: "border-destructive/20 bg-background/80 text-destructive",
+  },
+  neutral: {
+    shell: "border-border bg-muted/40 text-foreground",
+    accent: "text-foreground",
+    chip: "border-border bg-background/80 text-foreground",
+  },
+  accent: {
+    shell: "border-primary/30 bg-primary/10 text-primary",
+    accent: "text-primary",
+    chip: "border-primary/20 bg-background/80 text-primary",
+  },
 };
 
 /**
  * StatusBanner
- * 
+ *
  * A flexible, stateless informational banner for displaying multi-part status information.
  * Perfect for tournaments, events, sessions, or any scenario requiring primary/secondary
  * status display with optional center information and supporting messages.
- * 
- * @example
- * // Tournament round status
- * import { Settings, Clock, Users } from "lucide-react";
- * 
- * <StatusBanner
- *   primaryStatus={{ label: "Tournament", value: "Active", variant: "success" }}
- *   centerInfo={{ 
- *     label: "Round", 
- *     value: 3, 
- *     statusLabel: "In Progress",
- *     icon: Settings,
- *     animateIcon: true
- *   }}
- *   secondaryStatus={{ label: "Players", current: 24, max: 32 }}
- *   mainMessage="Round 3 is currently in progress"
- *   subMessages={[
- *     { text: "12 matches active", icon: Clock },
- *     { text: "8 players waiting", icon: Users }
- *   ]}
- *   variant="info"
- * />
- * 
- * @example
- * // Event capacity status
- * import { CheckCircle, MapPin } from "lucide-react";
- * 
- * <StatusBanner
- *   primaryStatus={{ label: "Event", value: "Registration Open", variant: "success" }}
- *   secondaryStatus={{ label: "Attendees", current: 156, max: 200 }}
- *   mainMessage="Early bird tickets available"
- *   subMessages={[{ text: "Downtown Venue", icon: MapPin }]}
- *   variant="success"
- * />
- * 
- * @example
- * // Simple status without center info
- * import { AlertCircle } from "lucide-react";
- * 
- * <StatusBanner
- *   primaryStatus={{ label: "System", value: "Maintenance", variant: "warning" }}
- *   secondaryStatus={{ label: "Affected Users", current: 45, max: 1000 }}
- *   mainMessage="Scheduled maintenance in progress"
- *   variant="warning"
- * />
  */
 export function StatusBanner({
   primaryStatus,
@@ -113,74 +92,96 @@ export function StatusBanner({
   secondaryStatus,
   mainMessage,
   subMessages,
-  variant
+  variant,
+  as = "h3",
+  className,
+  ...props
 }: StatusBannerProps) {
+  const Heading = as;
+  const styles = containerStyles[variant];
+  const primaryStyles = containerStyles[primaryStatus.variant];
+  const formatCenterValue = centerInfo?.formatValue ?? ((value: string | number) =>
+    typeof value === "number" ? `#${value}` : value
+  );
+
   return (
-    <div className={`backdrop-blur-sm rounded-2xl p-6 border transition-all duration-500 shadow-sm ${variantStyles[variant]}`}>
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-        {/* Left Side: Primary Status */}
+    <div
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      className={cn(
+        "rounded-2xl border p-6 shadow-sm backdrop-blur-sm transition-all duration-500",
+        styles.shell,
+        className
+      )}
+      {...props}
+    >
+      <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
         <div className="text-center md:text-left">
-          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">
+          <Heading className="mb-1 text-xs font-bold uppercase tracking-widest text-muted-foreground">
             {primaryStatus.label}
-          </h3>
-          <p className={`text-2xl font-black ${textVariantStyles[primaryStatus.variant]}`}>
+          </Heading>
+          <p className={cn("text-2xl font-black", primaryStyles.accent)}>
             {primaryStatus.value}
           </p>
         </div>
 
-        {/* Center: Optional Info (Round, Phase, Stage, etc.) */}
-        {centerInfo && (
-          <div className="flex items-center gap-4 bg-white/40 px-6 py-3 rounded-xl border border-white/20">
+        {centerInfo ? (
+          <div className="flex items-center gap-4 rounded-xl border border-border/80 bg-background/70 px-6 py-3">
             <div className="text-center">
-              <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
+              <div className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
                 {centerInfo.label}
-              </h4>
-              <p className="text-3xl font-black text-black leading-none">
-                {typeof centerInfo.value === 'number' ? `#${centerInfo.value}` : centerInfo.value}
+              </div>
+              <p className="text-3xl font-black leading-none text-foreground">
+                {formatCenterValue(centerInfo.value)}
               </p>
             </div>
-            <div className="w-px h-10 bg-gray-300/50" />
+            <div className="h-10 w-px bg-border" aria-hidden="true" />
             <div className="flex items-center gap-3">
-              <centerInfo.icon 
-                className={`h-8 w-8 ${centerInfo.animateIcon ? 'animate-spin' : ''}`} 
+              <centerInfo.icon
+                className={cn("h-8 w-8 text-foreground", centerInfo.animateIcon && "animate-spin")}
+                aria-hidden="true"
               />
-              <p className="text-lg font-bold text-black">{centerInfo.statusLabel}</p>
+              <p className="text-lg font-bold text-foreground">{centerInfo.statusLabel}</p>
             </div>
           </div>
-        )}
+        ) : null}
 
-        {/* Right Side: Secondary Status */}
         <div className="text-center md:text-right">
-          <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">
+          <div className="mb-1 text-xs font-bold uppercase tracking-widest text-muted-foreground">
             {secondaryStatus.label}
-          </h4>
-          <p className="text-3xl font-black text-black leading-none">
+          </div>
+          <p className="text-3xl font-black leading-none text-foreground">
             {secondaryStatus.current}
-            <span className="text-lg text-gray-400 font-medium ml-1">/{secondaryStatus.max}</span>
+            <span className="ml-1 text-lg font-medium text-muted-foreground">
+              /{secondaryStatus.max}
+            </span>
           </p>
         </div>
       </div>
 
-      {/* Footer Section: Main Message & Sub-details */}
-      <div className="mt-6 pt-6 border-t border-gray-200/50">
+      <div className="mt-6 border-t border-border/80 pt-6">
         <div className="text-center">
-          <p className="text-2xl font-black text-black tracking-tight mb-4">
+          <p className="mb-4 text-2xl font-black tracking-tight text-foreground">
             {mainMessage}
           </p>
-          
-          {subMessages && subMessages.length > 0 && (
-            <div className="flex flex-wrap items-center justify-center gap-6">
-              {subMessages.map((msg, idx) => (
-                <div 
-                  key={idx} 
-                  className="flex items-center gap-2 text-sm font-bold text-gray-600 bg-white/30 px-3 py-1.5 rounded-full border border-white/20"
+
+          {subMessages && subMessages.length > 0 ? (
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              {subMessages.map((msg) => (
+                <div
+                  key={msg.text}
+                  className={cn(
+                    "flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-bold",
+                    styles.chip
+                  )}
                 >
-                  <msg.icon className="h-4 w-4" />
+                  <msg.icon className="h-4 w-4" aria-hidden="true" />
                   <span>{msg.text}</span>
                 </div>
               ))}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>

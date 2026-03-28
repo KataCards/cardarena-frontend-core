@@ -1,99 +1,93 @@
-import { ReactNode } from "react";
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-export interface FeatureCardProps {
+type FeatureCardHeading = "h2" | "h3" | "h4" | "h5" | "h6";
+
+export interface FeatureCardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title" | "onClick"> {
   /** Icon element or component to display */
-  icon: ReactNode;
+  icon: React.ReactNode;
   /** Feature title */
   title: string;
   /** Feature description */
   description: string;
   /** Icon color variant */
-  iconColor?: "red" | "blue" | "green" | "purple" | "gray";
+  iconColor?: "primary" | "info" | "success" | "secondary" | "muted";
   /** Card background variant */
-  variant?: "white" | "gray" | "gradient";
+  variant?: "base" | "muted" | "surface";
   /** Optional click handler */
   onClick?: () => void;
+  /** Semantic heading level for the title. @default "h3" */
+  as?: FeatureCardHeading;
 }
 
 const iconColors = {
-  red: "text-red-600",
-  blue: "text-blue-600",
-  green: "text-green-600",
-  purple: "text-purple-600",
-  gray: "text-gray-600",
-};
+  primary: "text-primary",
+  info: "text-info",
+  success: "text-success",
+  secondary: "text-secondary",
+  muted: "text-muted-foreground",
+} as const;
 
 const variants = {
-  white: "bg-white",
-  gray: "bg-gray-50",
-  gradient: "bg-linear-to-br from-white to-gray-50",
-};
+  base: "bg-background border border-border",
+  muted: "bg-muted/30 border border-border",
+  surface: "bg-card border border-border",
+} as const;
 
 /**
  * FeatureCard
- * 
+ *
  * A card component for displaying features with an icon, title, and description.
- * Supports multiple color schemes and background variants.
- * 
- * @example
- * // Basic usage
- * import { Zap } from "lucide-react";
- * 
- * <FeatureCard
- *   icon={<Zap className="w-8 h-8" />}
- *   title="Lightning Fast"
- *   description="Experience blazing fast performance"
- * />
- * 
- * @example
- * // With custom colors
- * import { Shield, Rocket, Users } from "lucide-react";
- * 
- * <FeatureCard
- *   icon={<Shield className="w-8 h-8" />}
- *   title="Secure"
- *   description="Bank-level security"
- *   iconColor="blue"
- *   variant="gray"
- * />
- * 
- * <FeatureCard
- *   icon={<Rocket className="w-8 h-8" />}
- *   title="Scalable"
- *   description="Grows with your business"
- *   iconColor="purple"
- *   variant="gradient"
- * />
- * 
- * @example
- * // Interactive card
- * <FeatureCard
- *   icon={<Users className="w-8 h-8" />}
- *   title="Team Collaboration"
- *   description="Work together seamlessly"
- *   onClick={() => console.log("Feature clicked")}
- * />
+ * Supports semantic color schemes and surface variants.
  */
 export function FeatureCard({
   icon,
   title,
   description,
-  iconColor = "red",
-  variant = "white",
+  iconColor = "primary",
+  variant = "base",
   onClick,
+  as = "h3",
+  className,
+  ...props
 }: FeatureCardProps) {
-  const Component = onClick ? "button" : "div";
-  
+  const Heading = as;
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+          "rounded-xl p-8 shadow-sm transition-all hover:shadow-md cursor-pointer hover:scale-105 active:scale-100 text-left",
+          variants[variant],
+          className
+        )}
+        {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+      >
+        <div className={cn("mb-4", iconColors[iconColor])} aria-hidden="true">
+          {icon}
+        </div>
+        <Heading className="mb-3 text-xl font-semibold text-foreground">{title}</Heading>
+        <p className="text-muted-foreground">{description}</p>
+      </button>
+    );
+  }
+
   return (
-    <Component
-      onClick={onClick}
-      className={`${variants[variant]} p-8 rounded-xl shadow-sm hover:shadow-md transition-all ${
-        onClick ? "cursor-pointer hover:scale-105 active:scale-100" : ""
-      }`}
+    <div
+      className={cn(
+        "rounded-xl p-8 shadow-sm transition-all hover:shadow-md",
+        variants[variant],
+        className
+      )}
+      {...props}
     >
-      <div className={`${iconColors[iconColor]} mb-4`}>{icon}</div>
-      <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
-      <p className="text-gray-600">{description}</p>
-    </Component>
+      <div className={cn("mb-4", iconColors[iconColor])} aria-hidden="true">
+        {icon}
+      </div>
+      <Heading className="mb-3 text-xl font-semibold text-foreground">{title}</Heading>
+      <p className="text-muted-foreground">{description}</p>
+    </div>
   );
 }

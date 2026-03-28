@@ -62,11 +62,11 @@ export const features = [
 // --- Application / Dashboard Data ---
 
 export const quickActions: QuickActionItem[] = [
-  { title: 'Neues Turnier', href: '#', iconName: 'plus', colorClass: 'bg-green-600 hover:bg-green-700' },
-  { title: 'Alle Turniere', href: '#', iconName: 'trophy', colorClass: 'bg-blue-600 hover:bg-blue-700' },
-  { title: 'Neuer Spieler', href: '#', iconName: 'user-plus', colorClass: 'bg-purple-600 hover:bg-purple-700' },
-  { title: 'Alle Spieler', href: '#', iconName: 'users', colorClass: 'bg-indigo-600 hover:bg-indigo-700' },
-  { title: 'Einstellungen', href: '#', iconName: 'settings', colorClass: 'bg-gray-600 hover:bg-gray-700' },
+  { title: 'Neues Turnier', href: '#', iconName: 'plus', color: 'success' },
+  { title: 'Alle Turniere', href: '#', iconName: 'trophy', color: 'info' },
+  { title: 'Neuer Spieler', href: '#', iconName: 'user-plus', color: 'secondary' },
+  { title: 'Alle Spieler', href: '#', iconName: 'users', color: 'primary' },
+  { title: 'Einstellungen', href: '#', iconName: 'settings', color: 'muted' },
 ];
 
 export const mockTournaments: TournamentSummary[] = [

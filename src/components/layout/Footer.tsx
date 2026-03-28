@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 export interface FooterLink {
   /** Link label text */
@@ -11,6 +12,8 @@ export interface FooterLink {
 export interface FooterColumn {
   /** Column heading */
   title: string;
+  /** Heading level for the column title. @default "h4" */
+  as?: "h2" | "h3" | "h4" | "h5" | "h6";
   /** Array of links in this column */
   links: FooterLink[];
 }
@@ -22,13 +25,11 @@ export interface FooterProps {
     name: string;
     /** Brand description/tagline */
     description: string;
-    /** Optional logo/icon component */
-    logo?: React.ComponentType<{ className?: string }>;
-    /** Optional custom logo element */
-    logoElement?: ReactNode;
+    /** Optional logo element (component or pre-rendered element) */
+    logo?: ReactNode;
   };
-  /** Array of footer columns with links */
-  columns: FooterColumn[];
+  /** Array of footer columns with links (at least one column required) */
+  columns: [FooterColumn, ...FooterColumn[]];
   /** Copyright text (year is automatically added) */
   copyright?: string;
   /** Optional social media links */
@@ -43,7 +44,7 @@ export interface FooterProps {
   maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl" | "7xl" | "full";
 }
 
-const variantStyles = {
+const VARIANT_STYLES = {
   dark: {
     bg: "bg-gray-900",
     text: "text-white",
@@ -58,9 +59,9 @@ const variantStyles = {
     border: "border-gray-200",
     hover: "hover:text-gray-900",
   },
-};
+} as const;
 
-const maxWidths = {
+const MAX_WIDTHS = {
   sm: "max-w-screen-sm",
   md: "max-w-screen-md",
   lg: "max-w-screen-lg",
@@ -68,6 +69,14 @@ const maxWidths = {
   "2xl": "max-w-screen-2xl",
   "7xl": "max-w-7xl",
   full: "max-w-full",
+} as const;
+
+const GRID_COLUMNS: Record<number, string> = {
+  1: "md:grid-cols-1",
+  2: "md:grid-cols-2",
+  3: "md:grid-cols-3",
+  4: "md:grid-cols-4",
+  5: "md:grid-cols-5",
 };
 
 /**
@@ -77,14 +86,18 @@ const maxWidths = {
  * Fully customizable with support for light and dark variants.
  * 
  * @example
- * // Basic usage
+ * // Basic usage with icon component
  * import { Trophy } from "lucide-react";
  * 
  * <Footer
  *   brand={{
  *     name: "MyApp",
  *     description: "The best app for your needs",
- *     logo: Trophy
+ *     logo: (
+ *       <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+ *         <Trophy className="w-5 h-5 text-white" />
+ *       </div>
+ *     )
  *   }}
  *   columns={[
  *     {
@@ -106,16 +119,31 @@ const maxWidths = {
  * />
  * 
  * @example
- * // With social links
+ * // With social links and custom heading levels
  * import { Trophy, Github, Twitter, Linkedin } from "lucide-react";
  * 
  * <Footer
  *   brand={{
  *     name: "CardArena",
  *     description: "Professional tournament management",
- *     logo: Trophy
+ *     logo: (
+ *       <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+ *         <Trophy className="w-5 h-5 text-white" />
+ *       </div>
+ *     )
  *   }}
- *   columns={footerColumns}
+ *   columns={[
+ *     {
+ *       title: "Product",
+ *       as: "h3",
+ *       links: [...]
+ *     },
+ *     {
+ *       title: "Company",
+ *       as: "h3",
+ *       links: [...]
+ *     }
+ *   ]}
  *   social={[
  *     { label: "GitHub", href: "https://github.com", icon: Github },
  *     { label: "Twitter", href: "https://twitter.com", icon: Twitter },
@@ -141,27 +169,21 @@ export function Footer({
   variant = "dark",
   maxWidth = "7xl",
 }: FooterProps) {
-  const styles = variantStyles[variant];
-  const BrandLogo = brand.logo;
+  const styles = VARIANT_STYLES[variant];
   const currentYear = new Date().getFullYear();
+  const columnCount = Math.min(columns.length + 1, 5);
 
   return (
-    <footer className={`${styles.bg} ${styles.text} py-16`}>
-      <div className={`${maxWidths[maxWidth]} mx-auto px-4 sm:px-6 lg:px-8`}>
-        <div className={`grid grid-cols-1 md:grid-cols-${Math.min(columns.length + 1, 5)} gap-8`}>
+    <footer className={cn(styles.bg, styles.text, "py-16")} aria-label="Site footer">
+      <div className={cn(MAX_WIDTHS[maxWidth], "mx-auto px-4 sm:px-6 lg:px-8")}>
+        <div className={cn("grid grid-cols-1 gap-8", GRID_COLUMNS[columnCount])}>
           {/* Brand Column */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              {brand.logoElement ? (
-                brand.logoElement
-              ) : BrandLogo ? (
-                <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                  <BrandLogo className="w-5 h-5 text-white" />
-                </div>
-              ) : null}
+              {brand.logo}
               <span className="text-xl font-bold">{brand.name}</span>
             </div>
-            <p className={`${styles.textMuted} mb-4`}>{brand.description}</p>
+            <p className={cn(styles.textMuted, "mb-4")}>{brand.description}</p>
             
             {social && social.length > 0 && (
               <div className="flex gap-3">
@@ -171,7 +193,7 @@ export function Footer({
                     <Link
                       key={item.label}
                       href={item.href}
-                      className={`${styles.textMuted} ${styles.hover} transition-colors`}
+                      className={cn(styles.textMuted, styles.hover, "transition-colors")}
                       aria-label={item.label}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -185,27 +207,34 @@ export function Footer({
           </div>
 
           {/* Link Columns */}
-          {columns.map((column) => (
-            <div key={column.title}>
-              <h4 className="font-semibold mb-4">{column.title}</h4>
-              <ul className="space-y-2">
-                {column.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className={`${styles.textMuted} ${styles.hover} transition-colors text-sm`}
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {columns.map((column) => {
+            const Heading = column.as || "h4";
+            return (
+              <div key={column.title}>
+                <Heading className="font-semibold mb-4">{column.title}</Heading>
+                <ul className="space-y-2">
+                  {column.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className={cn(
+                          styles.textMuted,
+                          styles.hover,
+                          "transition-colors text-sm"
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
         </div>
 
         {/* Copyright */}
-        <div className={`border-t ${styles.border} mt-12 pt-8 text-center ${styles.textMuted}`}>
+        <div className={cn("border-t mt-12 pt-8 text-center", styles.border, styles.textMuted)}>
           <p>
             &copy; {currentYear} {copyright || brand.name}
           </p>

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Search } from "lucide-react";
 import { Input, InputProps } from "./Input";
 
-interface SearchInputProps extends Omit<InputProps, "type" | "leftSlot"> {
+export interface SearchInputProps extends Omit<InputProps, "type" | "leftSlot"> {
   /** Size of the search icon. @default 16 */
   iconSize?: number;
 }

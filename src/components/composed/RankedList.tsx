@@ -1,5 +1,11 @@
+import * as React from "react";
 import { User } from "lucide-react";
-import React from "react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { cn } from "@/lib/utils";
+
+type RankedListHeading = "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+type RankedItemVariant = "default" | "primary" | "success" | "warning";
 
 /**
  * Represents a single ranked item in the list.
@@ -19,6 +25,8 @@ export interface RankedItem {
   valueLabel?: string;
   /** Optional icon component to display */
   icon?: React.ComponentType<{ className?: string }>;
+  /** Optional semantic row emphasis */
+  variant?: RankedItemVariant;
   /** Optional custom styling for this item */
   className?: string;
 }
@@ -26,173 +34,147 @@ export interface RankedItem {
 /**
  * Props for the RankedList component.
  */
-export interface RankedListProps {
+export interface RankedListProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   /** Array of ranked items to display */
-  items: RankedItem[];
+  items: readonly RankedItem[];
   /** Optional heading text for the list */
-  title?: string;
+  title?: React.ReactNode;
   /** Optional icon component for the title */
   titleIcon?: React.ComponentType<{ className?: string }>;
+  /** Semantic heading level. @default "h3" */
+  as?: RankedListHeading;
   /** Default label for metric values when not specified per item */
   defaultValueLabel?: string;
   /** Message to display when list is empty */
   emptyMessage?: string;
-  /** Maximum height before scrolling (e.g., "400px", "96") */
+  /** Maximum height before scrolling (any valid CSS length). @default "24rem" */
   maxHeight?: string;
   /** Optional footer content */
   footer?: React.ReactNode;
+  /** Semantic heading level for the empty state title. @default "h3" */
+  emptyTitleAs?: RankedListHeading;
 }
+
+const itemVariantStyles: Record<RankedItemVariant, string> = {
+  default: "bg-background border-border hover:bg-accent/40",
+  primary: "bg-primary/10 border-primary/30 hover:bg-primary/15",
+  success: "bg-success/10 border-success/30 hover:bg-success/15",
+  warning: "bg-warning/10 border-warning/30 hover:bg-warning/15",
+};
 
 /**
  * RankedList
- * 
+ *
  * A clean, flexible component for displaying ranked items with optional icons,
- * sublabels, and custom styling. Perfect for leaderboards, standings, rankings,
- * or any ordered list with associated metrics.
- * 
- * @example
- * // Basic leaderboard
- * import { Trophy } from "lucide-react";
- * 
- * <RankedList
- *   title="Top Players"
- *   titleIcon={Trophy}
- *   items={[
- *     { id: "1", rank: 1, label: "Alice", value: 2500 },
- *     { id: "2", rank: 2, label: "Bob", value: 2300 },
- *     { id: "3", rank: 3, label: "Charlie", value: 2100 }
- *   ]}
- *   defaultValueLabel="Points"
- * />
- * 
- * @example
- * // With custom styling for top ranks
- * import { Trophy, Medal, Award } from "lucide-react";
- * 
- * <RankedList
- *   title="Tournament Standings"
- *   items={[
- *     { 
- *       id: "1", 
- *       rank: 1, 
- *       label: "Alice", 
- *       sublabel: "@alice_pro",
- *       value: 2500,
- *       icon: Trophy,
- *       className: "bg-gradient-to-r from-yellow-200/70 to-yellow-300/70 border-yellow-400"
- *     },
- *     { 
- *       id: "2", 
- *       rank: 2, 
- *       label: "Bob",
- *       value: 2300,
- *       icon: Medal,
- *       className: "bg-gradient-to-r from-gray-200/70 to-gray-300/70 border-gray-400"
- *     }
- *   ]}
- * />
- * 
- * @example
- * // Sales leaderboard with footer
- * import { DollarSign } from "lucide-react";
- * 
- * <RankedList
- *   title="Sales Leaders"
- *   titleIcon={DollarSign}
- *   items={salesData}
- *   defaultValueLabel="Revenue"
- *   maxHeight="500px"
- *   footer={<div className="text-sm text-gray-500">Updated hourly</div>}
- * />
+ * sublabels, and semantic item emphasis. Perfect for leaderboards, standings,
+ * rankings, or any ordered list with associated metrics.
  */
-export function RankedList({ 
-  items,
-  title,
-  titleIcon: TitleIcon,
-  defaultValueLabel = "Score",
-  emptyMessage = "No items to display",
-  maxHeight = "96",
-  footer,
-}: RankedListProps) {
-  
-  if (items.length === 0) {
+export const RankedList = React.forwardRef<HTMLDivElement, RankedListProps>(
+  (
+    {
+      items,
+      title,
+      titleIcon: TitleIcon,
+      as = "h3",
+      defaultValueLabel = "Score",
+      emptyMessage = "No items to display",
+      maxHeight = "24rem",
+      footer,
+      emptyTitleAs = "h3",
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    if (items.length === 0) {
+      return (
+        <Card ref={ref} className={className} {...props}>
+          {title ? (
+            <CardHeader>
+              <CardTitle as={as} className="flex items-center justify-center gap-2 text-center">
+                {TitleIcon ? <TitleIcon className="h-6 w-6 text-primary" aria-hidden="true" /> : null}
+                {title}
+              </CardTitle>
+            </CardHeader>
+          ) : null}
+          <CardContent className={cn(title ? undefined : "pt-6")}>
+            <EmptyState.Root className="rounded-xl border border-dashed border-border bg-muted/20">
+              <EmptyState.Icon icon={User} />
+              <EmptyState.Title as={emptyTitleAs}>{emptyMessage}</EmptyState.Title>
+            </EmptyState.Root>
+          </CardContent>
+        </Card>
+      );
+    }
+
     return (
-      <div className="bg-white backdrop-blur-sm rounded-xl p-6 border border-gray-200 shadow-sm">
-        {title && (
-          <h3 className="text-2xl font-bold mb-4 text-center flex items-center justify-center gap-2">
-            {TitleIcon && <TitleIcon className="h-6 w-6 text-red-600" />}
-            {title}
-          </h3>
-        )}
-        <div className="text-center py-8">
-          <User className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-          <p className="text-lg text-gray-500">{emptyMessage}</p>
-        </div>
-      </div>
+      <Card ref={ref} className={className} {...props}>
+        {title ? (
+          <CardHeader>
+            <CardTitle as={as} className="flex items-center justify-center gap-2 text-center">
+              {TitleIcon ? <TitleIcon className="h-6 w-6 text-primary" aria-hidden="true" /> : null}
+              {title}
+            </CardTitle>
+          </CardHeader>
+        ) : null}
+
+        <CardContent className={cn("space-y-3 overflow-y-auto pr-1", title ? undefined : "pt-6")} style={{ maxHeight }}>
+          <div role="list" className="space-y-3">
+            {items.map((item) => {
+              const ItemIcon = item.icon;
+              const valueLabel = item.valueLabel || defaultValueLabel;
+
+              return (
+                <div
+                  key={item.id}
+                  role="listitem"
+                  className={cn(
+                    "flex items-center justify-between rounded-xl border p-4 transition-all duration-300",
+                    itemVariantStyles[item.variant ?? "default"],
+                    item.className
+                  )}
+                >
+                  <div className="flex min-w-0 flex-1 items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      {ItemIcon ? <ItemIcon className="h-6 w-6 text-primary" aria-hidden="true" /> : null}
+                      <span className="text-lg font-bold text-foreground">
+                        {item.rank}.
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-lg font-semibold text-foreground">
+                        {item.label}
+                      </p>
+                      {item.sublabel ? (
+                        <p className="truncate text-sm text-muted-foreground">
+                          {item.sublabel}
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="ml-4 text-right">
+                    <p className="text-2xl font-bold leading-tight text-foreground">
+                      {item.value}
+                    </p>
+                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                      {valueLabel}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+
+        {footer ? (
+          <CardFooter className="border-t border-border pt-4">
+            {footer}
+          </CardFooter>
+        ) : null}
+      </Card>
     );
   }
+);
 
-  return (
-    <div className="bg-white backdrop-blur-sm rounded-xl p-6 border border-gray-200 shadow-sm">
-      {title && (
-        <h3 className="text-2xl font-bold mb-6 text-center flex items-center justify-center gap-2">
-          {TitleIcon && <TitleIcon className="h-6 w-6 text-red-600" />}
-          {title}
-        </h3>
-      )}
-
-      <div 
-        className="space-y-3 overflow-y-auto pr-1"
-        style={{ maxHeight: maxHeight.includes('px') ? maxHeight : `${parseInt(maxHeight) * 4}px` }}
-      >
-        {items.map((item) => {
-          const ItemIcon = item.icon;
-          const valueLabel = item.valueLabel || defaultValueLabel;
-          
-          return (
-            <div
-              key={item.id}
-              className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
-                item.className || 'bg-white/50 border-gray-200 hover:border-gray-300'
-              }`}
-            >
-              <div className="flex items-center flex-1 min-w-0 gap-4">
-                <div className="flex items-center gap-2">
-                  {ItemIcon && <ItemIcon className="h-6 w-6" />}
-                  <span className="text-lg font-bold text-black">
-                    {item.rank}.
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-lg font-semibold text-black truncate">
-                    {item.label}
-                  </p>
-                  {item.sublabel && (
-                    <p className="text-sm text-gray-600 truncate">
-                      {item.sublabel}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="text-right ml-4">
-                <p className="text-2xl font-bold text-black leading-tight">
-                  {item.value}
-                </p>
-                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {valueLabel}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {footer && (
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          {footer}
-        </div>
-      )}
-    </div>
-  );
-}
+RankedList.displayName = "RankedList";

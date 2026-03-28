@@ -83,7 +83,10 @@ export interface DialogTitleProps extends React.HTMLAttributes<HTMLHeadingElemen
 /**
  * Props for the Dialog description component
  */
-export interface DialogDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+export interface DialogDescriptionProps extends React.HTMLAttributes<HTMLElement> {
+  /** Element type to render as. @default "p" */
+  as?: "p" | "div" | "span";
+}
 
 /**
  * Props for the Dialog footer component
@@ -163,7 +166,8 @@ DialogPortal.displayName = "Dialog.Portal";
  * Dialog Overlay Component
  *
  * The backdrop behind the dialog.
- * Handles click-to-close functionality.
+ * Handles click-to-close functionality as the single source of truth
+ * for backdrop interactions.
  *
  * @example
  * <Dialog.Overlay />
@@ -171,10 +175,21 @@ DialogPortal.displayName = "Dialog.Portal";
  * @example
  * // Custom styling
  * <Dialog.Overlay className="bg-black/60" />
+ *
+ * @example
+ * // Disable click-to-close
+ * <Dialog.Overlay closeOnClick={false} />
  */
 const DialogOverlay = React.forwardRef<HTMLDivElement, DialogOverlayProps>(
   ({ closeOnClick = true, className, ...props }, ref) => {
     const { onOpenChange } = useDialogContext();
+
+    const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      // Only close if clicking directly on the overlay (not bubbled from content)
+      if (closeOnClick && e.target === e.currentTarget) {
+        onOpenChange(false);
+      }
+    };
 
     return (
       <div
@@ -186,7 +201,7 @@ const DialogOverlay = React.forwardRef<HTMLDivElement, DialogOverlayProps>(
           className
         )}
         data-state="open"
-        onClick={closeOnClick ? () => onOpenChange(false) : undefined}
+        onClick={handleClick}
         {...props}
       />
     );
@@ -199,6 +214,9 @@ DialogOverlay.displayName = "Dialog.Overlay";
  *
  * The main dialog container with focus trap and accessibility.
  * Handles Escape key, focus management, and ARIA attributes.
+ *
+ * Note: Click-outside-to-close is handled by Dialog.Overlay, not this component.
+ * This component only provides the content container and layout wrapper.
  *
  * @example
  * <Dialog.Content>
@@ -283,11 +301,11 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
       };
     }, []);
 
+    // Handle backdrop clicks via overlay click handler
+    // This component receives closeOnOverlayClick to pass context to overlay,
+    // but doesn't implement the handler itself
     return (
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        onClick={closeOnOverlayClick ? () => onOpenChange(false) : undefined}
-      >
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
           ref={contentRef}
           role="dialog"
@@ -295,13 +313,12 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
           aria-labelledby={titleId}
           aria-describedby={descriptionId}
           className={cn(
-            "relative bg-background rounded-lg shadow-lg w-full max-w-lg",
+            "relative bg-background rounded-lg shadow-lg w-full max-w-lg pointer-events-auto",
             "data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95",
             "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
             className
           )}
           data-state="open"
-          onClick={(e) => e.stopPropagation()}
           {...props}
         >
           {children}
@@ -381,19 +398,26 @@ DialogTitle.displayName = "Dialog.Title";
  * <Dialog.Description>
  *   This action cannot be undone.
  * </Dialog.Description>
+ *
+ * @example
+ * // Render as div for structured content
+ * <Dialog.Description as="div">
+ *   <ul>
+ *     <li>Item 1</li>
+ *     <li>Item 2</li>
+ *   </ul>
+ * </Dialog.Description>
  */
-const DialogDescription = React.forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
-  ({ className, ...props }, ref) => {
+const DialogDescription = React.forwardRef<HTMLElement, DialogDescriptionProps>(
+  ({ as: Comp = "p", className, ...props }, ref) => {
     const { descriptionId } = useDialogContext();
 
-    return (
-      <p
-        ref={ref}
-        id={descriptionId}
-        className={cn("text-sm text-muted-foreground", className)}
-        {...props}
-      />
-    );
+    return React.createElement(Comp, {
+      ref,
+      id: descriptionId,
+      className: cn("text-sm text-muted-foreground", className),
+      ...props,
+    });
   }
 );
 DialogDescription.displayName = "Dialog.Description";

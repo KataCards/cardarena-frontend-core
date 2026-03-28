@@ -1,14 +1,18 @@
-// components/composed/Hero.tsx
+import * as React from "react";
 import { ArrowRight } from "lucide-react";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 
-interface HeroProps {
+type HeroHeading = "h1" | "h2" | "h3" | "h4";
+
+interface HeroProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {
   /** Optional badge text displayed above the title */
-  badge?: string;
+  badge?: React.ReactNode;
   /** Main heading text, can include JSX for highlighting */
   title: React.ReactNode;
   /** Supporting description text below the title */
-  description: string;
+  description: React.ReactNode;
   /** Primary CTA button text */
   primaryText: string;
   /** Primary CTA button link */
@@ -17,47 +21,15 @@ interface HeroProps {
   secondaryText?: string;
   /** Optional secondary CTA button link */
   secondaryHref?: string;
+  /** Semantic heading level. @default "h1" */
+  as?: HeroHeading;
 }
 
 /**
  * Hero Section
- * 
- * High-impact landing page header with animated gradient background,
+ *
+ * High-impact landing page header with animated background,
  * optional badge, heading, description, and up to two call-to-action buttons.
- * 
- * @example
- * // Basic usage with primary action only
- * <Hero
- *   title="Build tournaments that players love"
- *   description="Professional tournament management made simple and beautiful."
- *   primaryText="Get Started"
- *   primaryHref="/signup"
- * />
- * 
- * @example
- * // With badge and secondary action
- * <Hero
- *   badge="🎉 Now in Open Beta"
- *   title={<>Manage tournaments <span className="text-red-600">effortlessly</span></>}
- *   description="Everything you need to run professional card game tournaments."
- *   primaryText="Start Free Trial"
- *   primaryHref="/signup"
- *   secondaryText="View Demo"
- *   secondaryHref="/demo"
- * />
- * 
- * @example
- * // Custom highlighted title
- * <Hero
- *   title={
- *     <>
- *       The <span className="text-red-600">ultimate</span> tournament platform
- *     </>
- *   }
- *   description="Trusted by organizers worldwide to deliver flawless events."
- *   primaryText="Explore Features"
- *   primaryHref="/features"
- * />
  */
 export function Hero({
   badge,
@@ -67,54 +39,80 @@ export function Hero({
   primaryHref,
   secondaryText,
   secondaryHref,
+  as = "h1",
+  className,
+  ...props
 }: HeroProps) {
+  const Heading = as;
+  const titleId = React.useId();
+  const isPlainDescription =
+    typeof description === "string" || typeof description === "number";
+
   return (
-    <section className="relative overflow-hidden bg-linear-to-br from-gray-50 via-white to-red-50">
-      {/* Animated background orbs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-red-200 rounded-full opacity-30 blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 left-0 -mb-20 -ml-20 w-96 h-96 bg-red-300 rounded-full opacity-20 blur-3xl animate-pulse [animation-delay:1s]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-gradient-radial from-red-100/40 to-transparent rounded-full animate-[spin_20s_linear_infinite]" />
+    <section
+      aria-labelledby={titleId}
+      className={cn(
+        "relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/40",
+        className
+      )}
+      {...props}
+    >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-primary/15 blur-3xl animate-pulse" />
+        <div className="absolute -bottom-20 -left-20 h-96 w-96 rounded-full bg-info/10 blur-3xl animate-pulse [animation-delay:1s]" />
+        <div className="absolute left-1/2 top-1/2 h-[38rem] w-[38rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-primary)_14%,transparent),transparent_65%)] animate-[spin_20s_linear_infinite]" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+      <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-32">
         <div className="text-center">
-          {badge && (
-            <div className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium bg-red-50 text-red-600 ring-1 ring-inset ring-red-600/20 mb-6 animate-fade-in">
+          {badge ? (
+            <Badge
+              variant="outline"
+              className="mb-6 animate-fade-in border-primary/20 bg-primary/10 text-primary"
+            >
               {badge}
-            </div>
-          )}
-          
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight animate-fade-in [animation-delay:100ms]">
+            </Badge>
+          ) : null}
+
+          <Heading
+            id={titleId}
+            className="mb-6 text-4xl font-bold tracking-tight text-foreground animate-fade-in md:text-6xl [animation-delay:100ms]"
+          >
             {title}
-          </h1>
-          
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed animate-fade-in [animation-delay:200ms]">
-            {description}
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in [animation-delay:300ms]">
+          </Heading>
+
+          {description ? (
+            isPlainDescription ? (
+              <p className="mx-auto mb-8 max-w-2xl text-xl leading-relaxed text-muted-foreground animate-fade-in [animation-delay:200ms]">
+                {description}
+              </p>
+            ) : (
+              <div className="mx-auto mb-8 max-w-2xl text-xl leading-relaxed text-muted-foreground animate-fade-in [animation-delay:200ms]">
+                {description}
+              </div>
+            )
+          ) : null}
+
+          <div className="flex flex-col justify-center gap-4 animate-fade-in [animation-delay:300ms] sm:flex-row">
             <Button
               size="lg"
               href={primaryHref}
-              variant="solid"
-              colorScheme="red"
+              variant="default"
               icon={ArrowRight}
               iconPosition="right"
             >
               {primaryText}
             </Button>
-            
-            {secondaryText && secondaryHref && (
+
+            {secondaryText && secondaryHref ? (
               <Button
                 size="lg"
                 href={secondaryHref}
                 variant="outline"
-                colorScheme="dark"
               >
                 {secondaryText}
               </Button>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
