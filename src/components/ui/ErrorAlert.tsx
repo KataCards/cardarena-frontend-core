@@ -20,12 +20,12 @@ export interface ErrorAlertTitleProps extends React.HTMLAttributes<HTMLHeadingEl
 /**
  * Props for the ErrorAlert description component
  */
-export interface ErrorAlertDescriptionProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type ErrorAlertDescriptionProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Props for the ErrorAlert action component
  */
-export interface ErrorAlertActionProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+export type ErrorAlertActionProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 /**
  * Variant styles using semantic tokens

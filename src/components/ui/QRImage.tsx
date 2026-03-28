@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import QRCode from "qrcode";
 
@@ -41,8 +42,10 @@ export async function QRImage({
   className,
   ...props
 }: QRImageProps) {
+  let dataUrl: string | null = null;
+
   try {
-    const dataUrl = await QRCode.toDataURL(url, {
+    dataUrl = await QRCode.toDataURL(url, {
       width: size,
       margin: 2,
       color: {
@@ -51,20 +54,11 @@ export async function QRImage({
       },
       errorCorrectionLevel,
     });
-
-    return (
-      <img
-        src={dataUrl}
-        alt={alt}
-        width={size}
-        height={size}
-        className={cn("block", className)}
-        {...props}
-      />
-    );
   } catch (error) {
     console.error("Failed to generate QR code:", error);
+  }
 
+  if (!dataUrl) {
     return (
       <div
         style={{ width: size, height: size }}
@@ -81,4 +75,16 @@ export async function QRImage({
       </div>
     );
   }
+
+  return (
+    <Image
+      src={dataUrl}
+      alt={alt}
+      width={size}
+      height={size}
+      unoptimized
+      className={cn("block", className)}
+      {...props}
+    />
+  );
 }

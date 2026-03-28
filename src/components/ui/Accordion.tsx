@@ -253,14 +253,17 @@ export function Accordion({
  * </AccordionItem>
  */
 export function AccordionItem({
-  id,
+  id: _id,
   isExpanded,
-  onToggle,
+  onToggle: _onToggle,
   disabled = false,
   className,
   children,
   ...rest
 }: AccordionItemComponentProps) {
+  void _id;
+  void _onToggle;
+
   return (
     <div
       className={cn(

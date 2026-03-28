@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { 
-  Trophy, Users, Zap, Shield, Rocket, Target, Clock, DollarSign, 
-  TrendingUp, MapPin, Calendar, Gamepad2, Settings,
-  CheckCircle, Code, Star, Mail, Search, Info, AlertTriangle
+  Trophy, Zap, Shield, Rocket, Mail
 } from "lucide-react";
 
 // Layout Components
@@ -285,7 +283,7 @@ export default function ComponentGallery() {
                   <EmptyState.Icon icon={Trophy} />
                   <EmptyState.Title>No Tournaments Yet</EmptyState.Title>
                   <EmptyState.Description>
-                    You haven't joined any tournaments. Start your competitive journey today!
+                    You haven&apos;t joined any tournaments. Start your competitive journey today!
                   </EmptyState.Description>
                   <EmptyState.Actions>
                     <Button>Explore Tournaments</Button>
@@ -330,7 +328,7 @@ export default function ComponentGallery() {
         <Features
           title="Everything you need"
           description="Professional tools for perfect tournaments"
-          variant="light"
+          variant="muted"
           features={[
             {
               icon: <Zap className="w-8 h-8" />,

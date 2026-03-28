@@ -156,15 +156,23 @@ export const Button = React.forwardRef<
     if (href) {
       // Filter out button-specific props that shouldn't be on anchor elements
       const {
-        type,
-        form,
-        formAction,
-        formEncType,
-        formMethod,
-        formNoValidate,
-        formTarget,
+        type: _type,
+        form: _form,
+        formAction: _formAction,
+        formEncType: _formEncType,
+        formMethod: _formMethod,
+        formNoValidate: _formNoValidate,
+        formTarget: _formTarget,
         ...anchorProps
       } = props;
+      void _type;
+      void _form;
+      void _formAction;
+      void _formEncType;
+      void _formMethod;
+      void _formNoValidate;
+      void _formTarget;
+
       return (
         <a
           ref={ref as React.Ref<HTMLAnchorElement>}

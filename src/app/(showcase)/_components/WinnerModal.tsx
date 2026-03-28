@@ -114,18 +114,16 @@ export function WinnerModal({
       onOpenChange={onOpenChange}
       showClose={false}
       className={cn(
-        "max-w-sm rounded-2xl p-0 overflow-hidden border-gray-100",
+        "max-w-sm overflow-hidden rounded-2xl border-border p-0",
         className
       )}
     >
-      {/* Title */}
       <Modal.Header className="px-6 pt-6 pb-4">
-        <Modal.Title className="text-2xl font-black text-gray-900 tracking-tight text-center">
+        <Modal.Title className="text-center text-2xl font-black tracking-tight text-foreground">
           {title}
         </Modal.Title>
       </Modal.Header>
 
-      {/* Options */}
       <div
         className="flex flex-col gap-3 px-6 pb-4"
         role="group"
@@ -134,23 +132,24 @@ export function WinnerModal({
         {options.map((option) => (
           <Button
             key={option.id}
-            variant="default"
+            type="button"
+            variant="outline"
             fullWidth
             onClick={() => onSelect(option.id)}
-            className="justify-between"
+            className="justify-between text-left font-semibold"
           >
             <span>{option.label}</span>
-            <span className="opacity-50" aria-hidden="true">
+            <span className="text-muted-foreground" aria-hidden="true">
               {option.icon ?? "🏆"}
             </span>
           </Button>
         ))}
       </div>
 
-      {/* Cancel button */}
       <div className="px-6 pb-6">
         <Button
           variant="ghost"
+          type="button"
           fullWidth
           onClick={() => onOpenChange(false)}
           className="text-sm font-bold uppercase tracking-widest"
@@ -159,9 +158,8 @@ export function WinnerModal({
         </Button>
       </div>
 
-      {/* Decorative accent stripe */}
       <div
-        className={cn("h-1.5 bg-red-600", stripeClassName)}
+        className={cn("h-1.5 bg-primary", stripeClassName)}
         aria-hidden="true"
       />
     </Modal>

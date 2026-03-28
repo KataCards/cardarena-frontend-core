@@ -223,7 +223,7 @@ export const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTableRowElement>) => {
       if (interactive && (e.key === "Enter" || e.key === " ")) {
         e.preventDefault();
-        onClick?.(e as any);
+        onClick?.(e as unknown as React.MouseEvent<HTMLTableRowElement>);
       }
       onKeyDown?.(e);
     };
@@ -288,7 +288,7 @@ export const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
   ({ className, scope = "col", align = "left", ...props }, ref) => (
     <th
       ref={ref}
-      scope={scope as any}
+      scope={scope}
       className={cn(
         "px-4 py-3 text-xs font-semibold text-foreground uppercase tracking-wider",
         alignmentMap[align],

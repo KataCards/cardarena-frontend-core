@@ -1,0 +1,133 @@
+import * as InputExamples from "../_components/InputExamples";
+import * as PageHeaderExamples from "../_components/PageHeaderExamples";
+import * as SpinnerExamples from "../_components/SpinnerExamples";
+import * as TableExamples from "../_components/TableExamples";
+import { AmbientBackground } from "@/components/effects/AmbientBackground";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { PageHeader, PageHeaderContent, PageHeaderDescription, PageHeaderHeading } from "@/components/ui/PageHeader";
+
+const sections = [
+  {
+    title: "Inputs",
+    description: "Field primitives and composed input patterns.",
+    items: [
+      { title: "Basic Input", component: InputExamples.BasicInputExample },
+      { title: "With Label", component: InputExamples.InputWithLabelExample },
+      { title: "Required Label", component: InputExamples.InputWithRequiredLabelExample },
+      { title: "Error State", component: InputExamples.InputWithErrorExample },
+      { title: "Left Icon", component: InputExamples.InputWithLeftIconExample },
+      { title: "Right Icon", component: InputExamples.InputWithRightIconExample },
+      { title: "Both Slots", component: InputExamples.InputWithBothSlotsExample },
+      { title: "Password Input", component: InputExamples.PasswordInputBasicExample },
+      { title: "Localized Password", component: InputExamples.PasswordInputLocalizedExample },
+      { title: "Password Error", component: InputExamples.PasswordInputWithErrorExample },
+      { title: "Basic Search", component: InputExamples.SearchInputBasicExample },
+      { title: "Search with Label", component: InputExamples.SearchInputWithLabelExample },
+      { title: "Large Search", component: InputExamples.SearchInputCustomSizeExample },
+      { title: "Complete Login Form", component: InputExamples.CompleteLoginFormExample },
+      { title: "Disabled States", component: InputExamples.DisabledInputsExample },
+    ],
+  },
+  {
+    title: "Tables",
+    description: "Data display patterns built on the table primitive.",
+    items: [
+      { title: "Simple Table", component: TableExamples.SimpleTableExample },
+      { title: "Interactive Rows", component: TableExamples.InteractiveTableExample },
+      { title: "Actions", component: TableExamples.TableWithActionsExample },
+      { title: "Striped", component: TableExamples.StripedTableExample },
+      { title: "Empty State", component: TableExamples.EmptyTableExample },
+      { title: "Responsive Scroll", component: TableExamples.ResponsiveTableExample },
+    ],
+  },
+  {
+    title: "Loading",
+    description: "Spinner and loading-state usage across common surfaces.",
+    items: [
+      { title: "Spinner in Buttons", component: SpinnerExamples.SpinnerInButtonExample },
+      { title: "Spinner Sizes", component: SpinnerExamples.SpinnerSizesExample },
+      { title: "Spinner Variants", component: SpinnerExamples.SpinnerVariantsExample },
+      { title: "Spinner in Table", component: SpinnerExamples.SpinnerInTableExample },
+      { title: "Simple Loading State", component: SpinnerExamples.LoadingStateSimpleExample },
+      { title: "Loading with Message", component: SpinnerExamples.LoadingStateWithMessageExample },
+      { title: "Custom Height", component: SpinnerExamples.LoadingStateCustomExample },
+      { title: "Spinner in Card", component: SpinnerExamples.SpinnerInCardExample },
+      { title: "Conditional Loading", component: SpinnerExamples.ConditionalLoadingExample },
+      { title: "Full Page Loading", component: SpinnerExamples.FullPageLoadingExample },
+    ],
+  },
+  {
+    title: "Page Headers",
+    description: "Heading and action compositions for app screens.",
+    items: [
+      { title: "Simple", component: PageHeaderExamples.SimplePageHeaderExample },
+      { title: "With Description", component: PageHeaderExamples.PageHeaderWithDescriptionExample },
+      { title: "Single Action", component: PageHeaderExamples.PageHeaderWithActionExample },
+      { title: "Multiple Actions", component: PageHeaderExamples.PageHeaderWithMultipleActionsExample },
+      { title: "Heading Icon", component: PageHeaderExamples.PageHeaderWithIconExample },
+      { title: "Back Button", component: PageHeaderExamples.PageHeaderWithBackButtonExample },
+      { title: "With Search", component: PageHeaderExamples.PageHeaderWithSearchExample },
+      { title: "Section Header", component: PageHeaderExamples.SectionHeaderExample },
+      { title: "Custom Spacing", component: PageHeaderExamples.PageHeaderWithCustomSpacingExample },
+      { title: "Minimal", component: PageHeaderExamples.MinimalHeaderExample },
+    ],
+  },
+] as const;
+
+export default function ShowcaseUiPage() {
+  return (
+    <AmbientBackground
+      variant="spotlight"
+      pattern="dots"
+      intensity="subtle"
+      className="min-h-screen"
+      contentClassName="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8"
+    >
+      <PageHeader className="mb-10">
+        <PageHeaderContent>
+          <PageHeaderHeading>UI Showcase</PageHeaderHeading>
+          <PageHeaderDescription>
+            Living documentation for the primitive layer and common composition patterns.
+          </PageHeaderDescription>
+        </PageHeaderContent>
+      </PageHeader>
+
+      <div className="space-y-12">
+        {sections.map((section) => (
+          <section
+            key={section.title}
+            aria-labelledby={section.title.toLowerCase().replace(/\s+/g, "-")}
+          >
+            <div className="mb-5">
+              <h2
+                id={section.title.toLowerCase().replace(/\s+/g, "-")}
+                className="text-2xl font-bold tracking-tight text-foreground"
+              >
+                {section.title}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
+            </div>
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              {section.items.map((item) => {
+                const Example = item.component;
+
+                return (
+                  <Card key={item.title} className="border-border/80 bg-card/95 backdrop-blur-sm">
+                    <CardHeader className="pb-4">
+                      <CardTitle as="h3" className="text-lg">
+                        {item.title}
+                      </CardTitle>
+                      <CardDescription>{section.title} example</CardDescription>
+                    </CardHeader>
+                    <CardContent>{Example ? <Example /> : null}</CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+    </AmbientBackground>
+  );
+}

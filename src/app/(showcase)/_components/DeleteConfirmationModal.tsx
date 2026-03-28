@@ -65,7 +65,7 @@ export interface DeleteConfirmationModalProps {
  *   onOpenChange={setOpen}
  *   message="Delete permanently?"
  *   icon={<Trash2 className="w-5 h-5" />}
- *   iconClassName="text-red-600"
+ *   iconClassName="text-destructive"
  *   onConfirm={handleDelete}
  * />
  */
@@ -145,7 +145,7 @@ export function DeleteConfirmationModal({
           {cancelText}
         </Button>
         <Button
-          variant="default"
+          variant="destructive"
           onClick={handleConfirm}
           disabled={loading}
         >

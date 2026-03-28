@@ -56,18 +56,18 @@ export interface SliderRootProps
 /**
  * Props for the Slider track component
  */
-export interface SliderTrackProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type SliderTrackProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Props for the Slider filled range component
  */
-export interface SliderRangeProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type SliderRangeProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Props for the Slider thumb component (native input)
  */
-export interface SliderThumbProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "onChange"> {}
+export type SliderThumbProps =
+  Omit<React.InputHTMLAttributes<HTMLInputElement>, "type" | "size" | "onChange">;
 
 /**
  * Props for the Slider value label component
@@ -152,7 +152,7 @@ const SliderTrack = React.forwardRef<HTMLDivElement, SliderTrackProps>(
     const sz = sizeStyles[size];
 
     return (
-      <div ref={ref} className="relative flex items-center w-full" {...props}>
+      <div ref={ref} className={cn("relative flex items-center w-full", className)} {...props}>
         {/* Background track */}
         <div
           className={cn(

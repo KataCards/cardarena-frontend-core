@@ -132,7 +132,7 @@ export const AmbientBackground = React.forwardRef<
             <>
               <div
                 className={cn(
-                  "absolute left-1/2 top-0 h-96 w-[42rem] -translate-x-1/2 -translate-y-1/3 rounded-full blur-3xl",
+                  "absolute left-1/2 top-0 h-96 w-2xl -translate-x-1/2 -translate-y-1/3 rounded-full blur-3xl",
                   glow.primary
                 )}
               />

@@ -91,7 +91,7 @@ export function MatchCard({
               <div key={player.name} className="flex items-center justify-between">
                 <span
                   className={cn(
-                    "max-w-[100px] truncate text-sm font-bold",
+                    "max-w-25 truncate text-sm font-bold",
                     isWinner ? "text-success" : "text-foreground"
                   )}
                 >

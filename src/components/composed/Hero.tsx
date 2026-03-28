@@ -52,7 +52,7 @@ export function Hero({
     <section
       aria-labelledby={titleId}
       className={cn(
-        "relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/40",
+        "relative overflow-hidden bg-linear-to-br from-background via-background to-muted/40",
         className
       )}
       {...props}
@@ -60,7 +60,7 @@ export function Hero({
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -right-20 -top-20 h-96 w-96 rounded-full bg-primary/15 blur-3xl animate-pulse" />
         <div className="absolute -bottom-20 -left-20 h-96 w-96 rounded-full bg-info/10 blur-3xl animate-pulse [animation-delay:1s]" />
-        <div className="absolute left-1/2 top-1/2 h-[38rem] w-[38rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-primary)_14%,transparent),transparent_65%)] animate-[spin_20s_linear_infinite]" />
+        <div className="absolute left-1/2 top-1/2 h-152 w-152 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklab,var(--color-primary)_14%,transparent),transparent_65%)] animate-[spin_20s_linear_infinite]" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-32">

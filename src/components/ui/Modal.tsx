@@ -27,7 +27,7 @@ export interface ModalProps {
 /**
  * Props for Modal.Header
  */
-export interface ModalHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type ModalHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Props for Modal.Title
@@ -48,7 +48,7 @@ export interface ModalDescriptionProps extends React.HTMLAttributes<HTMLElement>
 /**
  * Props for Modal.Footer
  */
-export interface ModalFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type ModalFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Modal Component
@@ -160,6 +160,7 @@ const ModalRoot = React.forwardRef<HTMLDivElement, ModalProps>(
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay
+            closeOnClick={closeOnOverlayClick}
             className={cn("bg-black/30 backdrop-blur-sm", overlayClassName)}
           />
           <Dialog.Content

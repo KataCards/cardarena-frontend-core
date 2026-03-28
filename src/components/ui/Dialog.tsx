@@ -70,7 +70,7 @@ export interface DialogContentProps extends React.HTMLAttributes<HTMLDivElement>
 /**
  * Props for the Dialog header component
  */
-export interface DialogHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Props for the Dialog title component
@@ -91,12 +91,12 @@ export interface DialogDescriptionProps extends React.HTMLAttributes<HTMLElement
 /**
  * Props for the Dialog footer component
  */
-export interface DialogFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type DialogFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Props for the Dialog close button component
  */
-export interface DialogCloseProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+export type DialogCloseProps = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 /**
  * Dialog Root Component
@@ -229,7 +229,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
   (
     {
       showClose = true,
-      closeOnOverlayClick = true,
+      closeOnOverlayClick: _closeOnOverlayClick = true,
       closeOnEscape = true,
       className,
       children,
@@ -237,6 +237,8 @@ const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps>(
     },
     ref
   ) => {
+    void _closeOnOverlayClick;
+
     const { onOpenChange, titleId, descriptionId } = useDialogContext();
     const contentRef = React.useRef<HTMLDivElement>(null);
 
@@ -375,15 +377,28 @@ DialogHeader.displayName = "Dialog.Header";
  * <Dialog.Title as="h1">Important Notice</Dialog.Title>
  */
 const DialogTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
-  ({ as: Comp = "h2", className, ...props }, ref) => {
+  ({ as = "h2", className, ...props }, ref) => {
     const { titleId } = useDialogContext();
-
-    return React.createElement(Comp, {
-      ref,
+    const titleProps = {
       id: titleId,
       className: cn("text-lg font-semibold text-foreground", className),
       ...props,
-    });
+    };
+
+    switch (as) {
+      case "h1":
+        return <h1 ref={ref as React.Ref<HTMLHeadingElement>} {...titleProps} />;
+      case "h3":
+        return <h3 ref={ref as React.Ref<HTMLHeadingElement>} {...titleProps} />;
+      case "h4":
+        return <h4 ref={ref as React.Ref<HTMLHeadingElement>} {...titleProps} />;
+      case "h5":
+        return <h5 ref={ref as React.Ref<HTMLHeadingElement>} {...titleProps} />;
+      case "h6":
+        return <h6 ref={ref as React.Ref<HTMLHeadingElement>} {...titleProps} />;
+      default:
+        return <h2 ref={ref as React.Ref<HTMLHeadingElement>} {...titleProps} />;
+    }
   }
 );
 DialogTitle.displayName = "Dialog.Title";
@@ -409,15 +424,22 @@ DialogTitle.displayName = "Dialog.Title";
  * </Dialog.Description>
  */
 const DialogDescription = React.forwardRef<HTMLElement, DialogDescriptionProps>(
-  ({ as: Comp = "p", className, ...props }, ref) => {
+  ({ as = "p", className, ...props }, ref) => {
     const { descriptionId } = useDialogContext();
-
-    return React.createElement(Comp, {
-      ref,
+    const descriptionProps = {
       id: descriptionId,
       className: cn("text-sm text-muted-foreground", className),
       ...props,
-    });
+    };
+
+    switch (as) {
+      case "div":
+        return <div ref={ref as React.Ref<HTMLDivElement>} {...descriptionProps} />;
+      case "span":
+        return <span ref={ref as React.Ref<HTMLSpanElement>} {...descriptionProps} />;
+      default:
+        return <p ref={ref as React.Ref<HTMLParagraphElement>} {...descriptionProps} />;
+    }
   }
 );
 DialogDescription.displayName = "Dialog.Description";

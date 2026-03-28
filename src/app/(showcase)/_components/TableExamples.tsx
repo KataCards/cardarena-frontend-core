@@ -84,7 +84,7 @@ export function InteractiveTableExample() {
               <TableCell className="font-medium">{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>
-                <Badge variant={user.status === "active" ? "success" : "neutral"}>
+                <Badge variant={user.status === "active" ? "success" : "outline"}>
                   {user.status}
                 </Badge>
               </TableCell>
@@ -125,7 +125,7 @@ export function TableWithActionsExample() {
               <TableCell className="font-medium">{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>
-                <Badge variant={user.role === "Admin" ? "info" : "neutral"}>
+                <Badge variant={user.role === "Admin" ? "info" : "outline"}>
                   {user.role}
                 </Badge>
               </TableCell>
@@ -134,7 +134,7 @@ export function TableWithActionsExample() {
                   <Button size="sm" variant="ghost">
                     Edit
                   </Button>
-                  <Button size="sm" variant="ghost" colorScheme="red">
+                  <Button size="sm" variant="destructive">
                     Delete
                   </Button>
                 </div>

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 /**
  * Props for the EmptyState root component
  */
-export interface EmptyStateRootProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type EmptyStateRootProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * Props for the EmptyState icon component
@@ -27,12 +27,12 @@ export interface EmptyStateTitleProps extends React.HTMLAttributes<HTMLHeadingEl
 /**
  * Props for the EmptyState description component
  */
-export interface EmptyStateDescriptionProps extends React.HTMLAttributes<HTMLParagraphElement> {}
+export type EmptyStateDescriptionProps = React.HTMLAttributes<HTMLParagraphElement>;
 
 /**
  * Props for the EmptyState actions component
  */
-export interface EmptyStateActionsProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type EmptyStateActionsProps = React.HTMLAttributes<HTMLDivElement>;
 
 /**
  * EmptyState Root Component

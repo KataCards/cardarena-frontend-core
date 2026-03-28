@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { SearchInput } from "@/components/ui/SearchInput";
+import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
 import { FieldError } from "@/components/ui/FieldError";
 import { Mail, DollarSign, Calendar } from "lucide-react";
@@ -255,12 +256,9 @@ export function CompleteLoginFormExample() {
         />
       </div>
 
-      <button
-        type="submit"
-        className="w-full px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
-      >
+      <Button type="submit" fullWidth>
         Sign In
-      </button>
+      </Button>
     </form>
   );
 }
