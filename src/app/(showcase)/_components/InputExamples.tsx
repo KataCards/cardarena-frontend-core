@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
+import { QRImage } from "@/components/ui/QRImage";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { Button } from "@/components/ui/Button";
 import { Label } from "@/components/ui/Label";
@@ -297,6 +298,31 @@ export function DisabledInputsExample() {
           placeholder="Cannot search"
           disabled
         />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Example 16: QR Code
+ *
+ * Server-rendered QR code image for share and scan flows.
+ */
+export async function QrCodeExample() {
+  return (
+    <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+      <QRImage
+        url="https://cardarena.example.com/tournaments/spring-open/check-in"
+        alt="QR code for tournament check-in"
+        size={176}
+        className="rounded-2xl border border-border bg-card p-3 shadow-sm"
+      />
+      <div className="space-y-2">
+        <p className="text-base font-semibold text-foreground">Tournament Check-In QR</p>
+        <p className="max-w-md text-sm leading-6 text-muted-foreground">
+          A server-rendered QR image for scan-to-join and event check-in flows. This is
+          useful for tables, posters, confirmation pages, and mobile handoff patterns.
+        </p>
       </div>
     </div>
   );

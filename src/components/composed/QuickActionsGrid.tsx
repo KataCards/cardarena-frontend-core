@@ -10,6 +10,8 @@ type QuickActionColor = "primary" | "info" | "success" | "secondary" | "muted";
  * Definition for a quick action button.
  */
 export interface QuickActionItem {
+  /** Optional stable identifier for keyed list rendering */
+  id?: string;
   /** Display label */
   title: string;
   /** Target navigation URL */
@@ -76,12 +78,13 @@ export function QuickActionsGrid({
 
   const gridContent = (
     <div role="list" className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
-      {actions.map((action) => {
+      {actions.map((action, index) => {
         const Icon = action.icon;
         const colors = colorStyles[action.color ?? "primary"];
+        const actionKey = action.id ?? `${action.href}-${action.title}-${index}`;
 
         return (
-          <div key={action.href || String(action.title)} role="listitem" className="h-full">
+          <div key={actionKey} role="listitem" className="h-full">
             <Link
               href={action.href}
               aria-label={typeof action.title === "string" ? action.title : undefined}

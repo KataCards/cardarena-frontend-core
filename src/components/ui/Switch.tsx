@@ -26,21 +26,21 @@ const sizeStyles: Record<
   sm: {
     track: "h-5 w-9",
     thumb: "h-4 w-4",
-    translate: "peer-checked:translate-x-4",
+    translate: "translate-x-4",
     label: "text-sm",
     description: "text-xs",
   },
   md: {
     track: "h-6 w-11",
     thumb: "h-5 w-5",
-    translate: "peer-checked:translate-x-5",
+    translate: "translate-x-5",
     label: "text-sm",
     description: "text-xs",
   },
   lg: {
     track: "h-7 w-14",
     thumb: "h-6 w-6",
-    translate: "peer-checked:translate-x-7",
+    translate: "translate-x-7",
     label: "text-base",
     description: "text-sm",
   },
@@ -74,6 +74,8 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
   (
     {
       checked,
+      defaultChecked,
+      onChange,
       label,
       description,
       size = "md",
@@ -90,6 +92,17 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
     const id = providedId ?? generatedId;
     const descriptionId = description ? `${id}-description` : undefined;
     const sz = sizeStyles[size];
+    const isControlled = checked !== undefined;
+    const [internalChecked, setInternalChecked] = React.useState(Boolean(defaultChecked));
+    const currentChecked = isControlled ? checked : internalChecked;
+
+    function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+      if (!isControlled) {
+        setInternalChecked(event.target.checked);
+      }
+
+      onChange?.(event);
+    }
 
     return (
       <label
@@ -106,17 +119,19 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
             id={id}
             type="checkbox"
             role="switch"
-            checked={checked}
+            checked={isControlled ? checked : undefined}
+            defaultChecked={isControlled ? undefined : defaultChecked}
             disabled={disabled}
             aria-label={!label ? ariaLabel : undefined}
             aria-describedby={descriptionId ?? ariaDescribedBy}
             className="peer sr-only"
+            onChange={handleChange}
             {...props}
           />
           <div
             className={cn(
               "rounded-full border border-transparent bg-muted transition-colors duration-200",
-              "peer-checked:bg-primary",
+              currentChecked && "bg-primary",
               "peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2",
               "peer-disabled:cursor-not-allowed",
               sz.track
@@ -127,7 +142,7 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
               className={cn(
                 "absolute left-0.5 top-1/2 -translate-y-1/2 rounded-full bg-background shadow-sm transition-transform duration-200",
                 sz.thumb,
-                sz.translate
+                currentChecked && sz.translate
               )}
             />
           </div>

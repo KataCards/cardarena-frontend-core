@@ -1,12 +1,64 @@
+import * as React from "react";
+import * as ButtonExamples from "../_components/ButtonsExamples";
+import * as ComposedExamples from "../_components/ComposedExamples";
 import * as InputExamples from "../_components/InputExamples";
 import * as PageHeaderExamples from "../_components/PageHeaderExamples";
 import * as SpinnerExamples from "../_components/SpinnerExamples";
 import * as TableExamples from "../_components/TableExamples";
 import { AmbientBackground } from "@/components/effects/AmbientBackground";
+import { InPageNavbar } from "@/components/composed/InPageNavbar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
 import { PageHeader, PageHeaderContent, PageHeaderDescription, PageHeaderHeading } from "@/components/ui/PageHeader";
+import { cn } from "@/lib/utils";
 
-const sections = [
+type ShowcaseItem = {
+  title: string;
+  component: () => React.ReactElement | Promise<React.ReactElement>;
+  fullWidth?: boolean;
+};
+
+type ShowcaseSection = {
+  title: string;
+  description: string;
+  items: ShowcaseItem[];
+};
+
+function toSectionId(title: string) {
+  return title.toLowerCase().replace(/\s+/g, "-").replace(/&/g, "and");
+}
+
+const sections: ShowcaseSection[] = [
+  {
+    title: "Buttons & Badges",
+    description: "Action variants, sizes, and status treatments from the primitive layer.",
+    items: [
+      { title: "Button Variants", component: ButtonExamples.ButtonVariantsExample },
+      { title: "Button Sizes", component: ButtonExamples.ButtonSizesExample },
+      { title: "Buttons with Icons", component: ButtonExamples.ButtonWithIconsExample },
+      { title: "Button States", component: ButtonExamples.ButtonStatesExample },
+      { title: "Badge Variants", component: ButtonExamples.BadgeVariantsExample },
+      { title: "Badge Sizes", component: ButtonExamples.BadgeSizesExample },
+    ],
+  },
+  {
+    title: "Composed Patterns",
+    description: "Higher-level UI pieces built from the primitive layer.",
+    items: [
+      { title: "Match Card", component: ComposedExamples.MatchCardExample },
+      { title: "Match Grid", component: ComposedExamples.MatchGridExample, fullWidth: true },
+      { title: "Bracket List", component: ComposedExamples.BracketListExample, fullWidth: true },
+      { title: "Battle Card", component: ComposedExamples.BattleCardExample },
+      { title: "Battle Card Compact", component: ComposedExamples.CompactBattleCardExample },
+      { title: "Quick Actions Grid", component: ComposedExamples.QuickActionsGridExample },
+      { title: "Ranked List", component: ComposedExamples.RankedListExample },
+      { title: "Pricing Section", component: ComposedExamples.PricingExample, fullWidth: true },
+      {
+        title: "Testimonials Section",
+        component: ComposedExamples.TestimonialsExample,
+        fullWidth: true,
+      },
+    ],
+  },
   {
     title: "Inputs",
     description: "Field primitives and composed input patterns.",
@@ -24,6 +76,7 @@ const sections = [
       { title: "Basic Search", component: InputExamples.SearchInputBasicExample },
       { title: "Search with Label", component: InputExamples.SearchInputWithLabelExample },
       { title: "Large Search", component: InputExamples.SearchInputCustomSizeExample },
+      { title: "QR Code", component: InputExamples.QrCodeExample, fullWidth: true },
       { title: "Complete Login Form", component: InputExamples.CompleteLoginFormExample },
       { title: "Disabled States", component: InputExamples.DisabledInputsExample },
     ],
@@ -72,9 +125,14 @@ const sections = [
       { title: "Minimal", component: PageHeaderExamples.MinimalHeaderExample },
     ],
   },
-] as const;
+];
 
 export default function ShowcaseUiPage() {
+  const navItems = sections.map((section) => ({
+    label: section.title,
+    href: `#${toSectionId(section.title)}`,
+  }));
+
   return (
     <AmbientBackground
       variant="spotlight"
@@ -92,16 +150,18 @@ export default function ShowcaseUiPage() {
         </PageHeaderContent>
       </PageHeader>
 
+      <InPageNavbar items={navItems} className="mb-10" />
+
       <div className="space-y-12">
         {sections.map((section) => (
           <section
             key={section.title}
-            aria-labelledby={section.title.toLowerCase().replace(/\s+/g, "-")}
+            aria-labelledby={toSectionId(section.title)}
           >
             <div className="mb-5">
               <h2
-                id={section.title.toLowerCase().replace(/\s+/g, "-")}
-                className="text-2xl font-bold tracking-tight text-foreground"
+                id={toSectionId(section.title)}
+                className="before:pointer-events-none before:invisible before:block before:h-56 before:-mt-56 sm:before:h-48 sm:before:-mt-48 lg:before:h-40 lg:before:-mt-40 text-2xl font-bold tracking-tight text-foreground"
               >
                 {section.title}
               </h2>
@@ -113,7 +173,13 @@ export default function ShowcaseUiPage() {
                 const Example = item.component;
 
                 return (
-                  <Card key={item.title} className="border-border/80 bg-card/95 backdrop-blur-sm">
+                  <Card
+                    key={item.title}
+                    className={cn(
+                      "border-border/80 bg-card/95 backdrop-blur-sm",
+                      item.fullWidth && "lg:col-span-2"
+                    )}
+                  >
                     <CardHeader className="pb-4">
                       <CardTitle as="h3" className="text-lg">
                         {item.title}

@@ -2,7 +2,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import QRCode from "qrcode";
 
-export interface QRImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
+export interface QRImageProps {
   /** The URL to encode in the QR code */
   url: string;
   /** QR code size in pixels @default 256 */
@@ -15,6 +15,12 @@ export interface QRImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   errorCorrectionLevel?: "L" | "M" | "Q" | "H";
   /** Accessible description of what the QR code links to — required */
   alt: string;
+  /** Additional CSS classes */
+  className?: string;
+  /** Image priority for LCP optimization @default false */
+  priority?: boolean;
+  /** Image loading strategy @default "lazy" */
+  loading?: "lazy" | "eager";
 }
 
 /**
@@ -30,6 +36,7 @@ export interface QRImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
  *   size={512}
  *   className="rounded-lg shadow-lg"
  *   alt="Event registration QR code"
+ *   priority
  * />
  */
 export async function QRImage({
@@ -40,7 +47,8 @@ export async function QRImage({
   errorCorrectionLevel = "M",
   alt,
   className,
-  ...props
+  priority = false,
+  loading = "lazy",
 }: QRImageProps) {
   let dataUrl: string | null = null;
 
@@ -69,7 +77,6 @@ export async function QRImage({
         )}
         role="img"
         aria-label={`Failed to generate QR code for: ${alt}`}
-        {...props as React.HTMLAttributes<HTMLDivElement>}
       >
         <span className="text-red-600 text-sm font-medium">QR Code Error</span>
       </div>
@@ -83,8 +90,9 @@ export async function QRImage({
       width={size}
       height={size}
       unoptimized
+      priority={priority}
+      loading={loading}
       className={cn("block", className)}
-      {...props}
     />
   );
 }

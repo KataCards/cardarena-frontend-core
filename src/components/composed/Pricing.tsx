@@ -12,7 +12,10 @@ export interface PricingPlan {
   features: string[];
   buttonText: string;
   isPopular?: boolean;
+  description?: string;
+  buttonHref?: string;
   isContact?: boolean;
+  priceDescription?: string
 }
 
 interface PricingProps extends Omit<React.HTMLAttributes<HTMLElement>, "title"> {

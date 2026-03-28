@@ -1,412 +1,369 @@
-"use client";
-
-import { useState } from "react";
-import { 
-  Trophy, Zap, Shield, Rocket, Mail
+import {
+  ArrowRight,
+  Blocks,
+  LayoutTemplate,
+  LogIn,
+  Settings,
+  Sparkles,
+  SwatchBook,
+  Trophy,
 } from "lucide-react";
-
-// Layout Components
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-
-// Composed Components
-import { Hero } from "@/components/composed/Hero";
-import { Features } from "@/components/composed/Features";
+import packageJson from "../../../package.json";
+import { AmbientBackground } from "@/components/effects/AmbientBackground";
 import { CTA } from "@/components/composed/CTA";
-
-// UI Components
+import { Features } from "@/components/composed/Features";
+import { MarketingSection } from "@/components/composed/MarketingSection";
+import { MetricsOverview } from "@/components/composed/MetricsOverview";
+import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
-import { Countdown } from "@/components/ui/Countdown";
-import { Accordion } from "@/components/ui/Accordion";
-import { 
-  TableContainer, Table, TableHeader, TableBody, TableRow, TableHead, TableCell 
-} from "@/components/ui/Table";
-import { Slider } from "@/components/ui/Slider";
-import { Input } from "@/components/ui/Input";
-import { PasswordInput } from "@/components/ui/PasswordInput";
-import { SearchInput } from "@/components/ui/SearchInput";
-import { Label } from "@/components/ui/Label";
-import { FieldError } from "@/components/ui/FieldError";
-import { WinnerModal } from "@/components/modals/WinnerModal";
-import { ErrorAlert } from "@/components/ui/ErrorAlert";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/Card";
 
-/**
- * Component Reference Gallery
- * 
- * A comprehensive showcase of all available components in the CardArena Core Library.
- * Each component is rendered with realistic, representative props to demonstrate
- * its purpose, variants, and key features.
- */
-export default function ComponentGallery() {
-  const [isWinnerModalOpen, setIsWinnerModalOpen] = useState(false);
-  const [sliderValue, setSliderValue] = useState(50);
-  const [accordionExpanded, setAccordionExpanded] = useState<Set<string>>(new Set(["1"]));
+const showcaseRoutes = [
+  {
+    title: "UI Showcase",
+    href: "/ui",
+    description:
+      "Browse primitives and examples in a dedicated route instead of a monolithic landing-page gallery.",
+    icon: SwatchBook,
+    eyebrow: "Living docs",
+  },
+  {
+    title: "Login Demo",
+    href: "/login",
+    description:
+      "See a route-level authentication example built from the actual input, alert, and button primitives.",
+    icon: LogIn,
+    eyebrow: "Auth pattern",
+  },
+  {
+    title: "Settings Demo",
+    href: "/settings",
+    description:
+      "Review a tabbed settings flow composed from real primitives, not internal throwaway demo controls.",
+    icon: Settings,
+    eyebrow: "App pattern",
+  },
+] as const;
 
-  const handleAccordionToggle = (id: string) => {
-    setAccordionExpanded(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+const featureItems = [
+  {
+    icon: <Blocks className="h-8 w-8" />,
+    title: "Primitives First",
+    description:
+      "UI components stay generic, typed, accessible, and theme-aware so higher-level patterns do not drift.",
+  },
+  {
+    icon: <LayoutTemplate className="h-8 w-8" />,
+    title: "Composed Layer",
+    description:
+      "Sections, dashboards, and workflow shells are built from primitives instead of reintroducing one-off styling.",
+  },
+  {
+    icon: <Sparkles className="h-8 w-8" />,
+    title: "Showcase Routes",
+    description:
+      "Examples now live under real App Router pages so they behave like living documentation rather than dead snippets.",
+  },
+] as const;
 
-  const tableData = [
-    { id: 1, name: "Alice Johnson", role: "Organizer", status: "Active" },
-    { id: 2, name: "Bob Smith", role: "Player", status: "Inactive" },
-    { id: 3, name: "Charlie Brown", role: "Admin", status: "Active" },
-  ];
+export default function LandingPage() {
+  const version = packageJson.version;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* ========================================
-          LAYOUT COMPONENTS
-      ======================================== */}
-      
-      {/* Navbar - White Variant */}
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar
         brand={{
-          name: "CardArena",
-          subtext: "Component Gallery",
-          href: "/"
+          name: "CardArena Core",
+          subtext: `v${version}`,
+          href: "/",
         }}
         links={[
-          { label: "Home", href: "#" },
-          { label: "Features", href: "#features" },
+          { label: "Overview", href: "#overview" },
+          { label: "Routes", href: "#routes" },
           { label: "Components", href: "#components" },
-          { label: "Pricing", href: "#pricing" },
-          { label: "Contact", href: "#contact" }
+          { label: "Adoption", href: "#adoption" },
         ]}
-        action={{ label: "Get Started", href: "/signup" }}
+        action={{ label: "Open UI Showcase", href: "/ui" }}
         variant="white"
-        sticky={true}
+        sticky
       />
 
       <main>
-        {/* ========================================
-            HERO SECTION
-        ======================================== */}
-        
-        {/* Hero - With Badge & Secondary Action */}
-        <Hero
-          badge="🎉 v0.2.0 Now Available"
-          title={
+        <AmbientBackground
+          variant="aurora"
+          pattern="grid"
+          intensity="strong"
+          className="border-b border-border bg-linear-to-br from-background via-primary/5 to-info/10"
+          contentClassName="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28"
+        >
+          <section
+            id="overview"
+            className="grid items-center gap-12 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]"
+          >
+            <div>
+              <div className="mb-6 inline-flex rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
+                v{version} • App Router showcase ready
+              </div>
+              <h1 className="max-w-3xl text-5xl font-bold tracking-tight text-foreground md:text-6xl">
+                A frontend core for tournament products, now organized like a real app.
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+                The library now separates primitives, composed patterns, layout shells, and
+                showcase routes cleanly. The landing page introduces the system. The live
+                routes prove it.
+              </p>
+
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Button href="/ui" size="lg" icon={ArrowRight} iconPosition="right">
+                  Explore UI Showcase
+                </Button>
+                <Button href="/settings" size="lg" variant="outline">
+                  Open Settings Demo
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid gap-4">
+              {showcaseRoutes.map((route, index) => {
+                const Icon = route.icon;
+                const surfaceStyles = [
+                  "border-primary/20 bg-gradient-to-br from-background via-primary/5 to-primary/10",
+                  "border-info/20 bg-gradient-to-br from-background via-info/5 to-info/10",
+                  "border-success/20 bg-gradient-to-br from-background via-success/5 to-success/10",
+                ] as const;
+                const iconStyles = [
+                  "bg-primary/12 text-primary",
+                  "bg-info/12 text-info",
+                  "bg-success/12 text-success",
+                ] as const;
+
+                return (
+                  <Card
+                    key={route.href}
+                    className={`${surfaceStyles[index]} backdrop-blur-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-2xl`}
+                  >
+                    <CardHeader className="pb-3">
+                      <div className="mb-3 flex items-center gap-3">
+                        <div className={`rounded-xl p-2 ${iconStyles[index]}`} aria-hidden="true">
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <span className="text-xs font-black uppercase tracking-[0.18em] text-muted-foreground">
+                          {route.eyebrow}
+                        </span>
+                      </div>
+                      <CardTitle as="h2" className="text-2xl">
+                        {route.title}
+                      </CardTitle>
+                      <CardDescription className="mt-1">{route.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <Button href={route.href} variant="ghost" className="px-0 text-primary hover:bg-transparent">
+                        Visit route
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </section>
+        </AmbientBackground>
+
+        <MarketingSection
+          id="routes"
+          badge={{ label: "Navigation", variant: "info" }}
+          title="Reach every showcase route directly"
+          description="The landing page is no longer the only place where components exist. It now points into live route-level demos that reflect actual App Router usage."
+          className="bg-linear-to-b from-background via-muted/10 to-background py-4"
+          actions={
             <>
-              Build <span className="text-primary">tournament platforms</span> that players love
+              <Button href="/login" variant="outline">
+                Login Route
+              </Button>
+              <Button href="/settings" variant="outline">
+                Settings Route
+              </Button>
+              <Button href="/ui">UI Route</Button>
             </>
           }
-          description="A complete library of production-grade React components for card game tournaments, event management, and competitive gaming platforms."
-          primaryText="Explore Components"
-          primaryHref="#components"
-          secondaryText="View on GitHub"
-          secondaryHref="https://github.com"
+        >
+          <div className="grid gap-6 lg:grid-cols-3">
+            {showcaseRoutes.map((route, index) => {
+              const Icon = route.icon;
+              const panelStyles = [
+                "border-primary/15 bg-primary/5",
+                "border-info/15 bg-info/5",
+                "border-success/15 bg-success/5",
+              ] as const;
+              const chipStyles = [
+                "bg-primary/10 text-primary",
+                "bg-info/10 text-info",
+                "bg-success/10 text-success",
+              ] as const;
+
+              return (
+                <Card key={route.href} className={`h-full ${panelStyles[index]}`}>
+                  <CardHeader>
+                    <div className={`mb-2 inline-flex w-fit rounded-lg p-2 ${chipStyles[index]}`} aria-hidden="true">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <CardTitle as="h3" className="text-xl">
+                      {route.title}
+                    </CardTitle>
+                    <CardDescription>{route.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Button href={route.href} fullWidth variant="outline">
+                      Open {route.title}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </MarketingSection>
+
+        <section
+          id="components"
+          className="border-y border-border bg-linear-to-r from-primary/5 via-background to-info/5 py-20"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <MetricsOverview
+              badge={{ label: "System snapshot", variant: "secondary" }}
+              title="A smaller, clearer component system"
+              description="The core is now organized around primitives, composed patterns, effects, and route-level showcases."
+              stats={[
+                {
+                  title: "Showcase routes",
+                  value: "3",
+                  icon: LayoutTemplate,
+                  iconColor: "primary",
+                  variant: "surface",
+                },
+                {
+                  title: "Effect primitives",
+                  value: "2",
+                  icon: Sparkles,
+                  iconColor: "info",
+                  variant: "surface",
+                },
+                {
+                  title: "Battle-ready cards",
+                  value: "1v1 + teams",
+                  icon: Trophy,
+                  iconColor: "success",
+                  variant: "surface",
+                },
+                {
+                  title: "Current release",
+                  value: `v${version}`,
+                  icon: SwatchBook,
+                  iconColor: "muted",
+                  variant: "surface",
+                },
+              ]}
+            />
+          </div>
+        </section>
+
+        <Features
+          title="The library is opinionated where it helps, generic where it matters"
+          description="The goal is not a pile of demo widgets. It is a coherent system you can actually build from."
+          variant="muted"
+          maxWidth="7xl"
+          className="bg-linear-to-b from-background via-muted/20 to-background"
+          features={featureItems}
         />
 
-        {/* ========================================
-            UI COMPONENTS SHOWCASE
-        ======================================== */}
-        
-        <section id="components" className="py-20 bg-background border-t border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-foreground mb-4">UI Components</h2>
-              <p className="text-xl text-muted-foreground">Flexible, reusable building blocks</p>
-            </div>
+        <section
+          id="adoption"
+          className="bg-linear-to-br from-background via-info/5 to-primary/5 py-20"
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Card className="border-primary/20 bg-linear-to-br from-background via-primary/5 to-primary/10">
+                <CardHeader>
+                  <div className="mb-2 inline-flex w-fit rounded-lg bg-primary/10 p-2 text-primary" aria-hidden="true">
+                    <Blocks className="h-5 w-5" />
+                  </div>
+                  <CardTitle as="h2" className="text-2xl">
+                    What changed in v{version}
+                  </CardTitle>
+                  <CardDescription>
+                    The repo now treats examples as real routes, trims example-only clutter from the component tree,
+                    and adds a stronger composed layer for application patterns.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3 text-sm leading-relaxed text-muted-foreground">
+                  <p>Showcase pages live under `app/(showcase)` instead of pretending to be reusable components.</p>
+                  <p>Layout and global CSS now come from the real root App Router layout.</p>
+                  <p>Display cards and match types were tightened so 1v1 and team battles have clearer ownership.</p>
+                </CardContent>
+              </Card>
 
-            {/* Buttons & Badges */}
-            <div className="mb-20">
-              <h3 className="text-2xl font-bold text-foreground mb-6">Buttons & Badges</h3>
-              <div className="space-y-8">
-                <div className="flex flex-wrap gap-4 items-center">
-                  <Button variant="default">Default</Button>
-                  <Button variant="secondary">Secondary</Button>
-                  <Button variant="outline">Outline</Button>
-                  <Button variant="ghost">Ghost</Button>
-                  <Button variant="destructive">Destructive</Button>
-                  <Button variant="default" size="lg" icon={Rocket} iconPosition="right">
-                    Get Started
+              <Card className="border-info/20 bg-linear-to-br from-background via-info/5 to-info/10">
+                <CardHeader>
+                  <div className="mb-2 inline-flex w-fit rounded-lg bg-info/10 p-2 text-info" aria-hidden="true">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
+                  <CardTitle as="h2" className="text-2xl">
+                    Start with the route that matches your goal
+                  </CardTitle>
+                  <CardDescription>
+                    You do not need to inspect a giant demo page to understand the system anymore.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="grid gap-3 sm:grid-cols-3">
+                  <Button href="/ui" variant="outline">
+                    Browse UI
                   </Button>
-                </div>
-                <div className="flex flex-wrap gap-4 items-center">
-                  <Badge variant="default">Default</Badge>
-                  <Badge variant="secondary">Secondary</Badge>
-                  <Badge variant="success">Success</Badge>
-                  <Badge variant="warning">Warning</Badge>
-                  <Badge variant="destructive">Destructive</Badge>
-                  <Badge variant="info">Info</Badge>
-                  <Badge variant="outline">Outline</Badge>
-                </div>
-              </div>
-            </div>
-
-            {/* Inputs */}
-            <div className="mb-20">
-              <h3 className="text-2xl font-bold text-foreground mb-6">Forms & Inputs</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="email" required>Email Address</Label>
-                    <Input id="email" type="email" placeholder="you@example.com" leftSlot={<Mail className="w-4 h-4 text-muted-foreground" />} />
-                  </div>
-                  <div>
-                    <Label htmlFor="search">Search</Label>
-                    <SearchInput id="search" placeholder="Search tournaments..." />
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="password">Password</Label>
-                    <PasswordInput id="password" placeholder="Enter your password" />
-                  </div>
-                  <div>
-                    <Label htmlFor="error-input">Input with Error</Label>
-                    <Input id="error-input" placeholder="Invalid value" className="border-destructive" aria-invalid="true" />
-                    <FieldError>This field is required.</FieldError>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Table */}
-            <div className="mb-20">
-              <h3 className="text-2xl font-bold text-foreground mb-6">Data Table</h3>
-              <TableContainer>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead align="right">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {tableData.map((row) => (
-                      <TableRow key={row.id}>
-                        <TableCell className="font-medium">{row.name}</TableCell>
-                        <TableCell>{row.role}</TableCell>
-                        <TableCell align="right">
-                          <Badge variant={row.status === "Active" ? "success" : "secondary"}>
-                            {row.status}
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </div>
-
-            {/* Accordion & Slider */}
-            <div className="mb-20 grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div>
-                <h3 className="text-2xl font-bold text-foreground mb-6">Accordion</h3>
-                <Accordion.Root>
-                  <Accordion.Item id="1" isExpanded={accordionExpanded.has("1")} onToggle={handleAccordionToggle}>
-                    <Accordion.Header id="1" isExpanded={accordionExpanded.has("1")} onToggle={handleAccordionToggle}>
-                      What is CardArena?
-                    </Accordion.Header>
-                    <Accordion.Content id="1" isExpanded={accordionExpanded.has("1")}>
-                      CardArena is a professional tournament management platform for card games.
-                    </Accordion.Content>
-                  </Accordion.Item>
-                  <Accordion.Item id="2" isExpanded={accordionExpanded.has("2")} onToggle={handleAccordionToggle}>
-                    <Accordion.Header id="2" isExpanded={accordionExpanded.has("2")} onToggle={handleAccordionToggle}>
-                      Is it open source?
-                    </Accordion.Header>
-                    <Accordion.Content id="2" isExpanded={accordionExpanded.has("2")}>
-                      Yes! CardArena is built as an open-source core library for developers.
-                    </Accordion.Content>
-                  </Accordion.Item>
-                </Accordion.Root>
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold text-foreground mb-6">Slider</h3>
-                <div className="space-y-8">
-                  <Slider.Root value={sliderValue} onChange={setSliderValue} min={0} max={100} size="md">
-                    <div className="flex justify-between items-center mb-2">
-                      <Label className="mb-0">Volume Control</Label>
-                      <Slider.Value format={(v) => `${v}%`} />
-                    </div>
-                    <Slider.Track>
-                      <Slider.Range />
-                      <Slider.Thumb />
-                    </Slider.Track>
-                    <Slider.RangeLabels />
-                  </Slider.Root>
-
-                  <Slider.Root value={25} onChange={() => {}} size="lg">
-                    <Slider.Track>
-                      <Slider.Range className="bg-success" />
-                      <Slider.Thumb className="[&::-webkit-slider-thumb]:border-success" />
-                    </Slider.Track>
-                  </Slider.Root>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal & Alerts */}
-            <div className="mb-20">
-              <h3 className="text-2xl font-bold text-foreground mb-6">Modals & Feedback</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <ErrorAlert.Root>
-                    <ErrorAlert.Title>System Error</ErrorAlert.Title>
-                    <ErrorAlert.Description>
-                      Unable to connect to the game server. Please check your internet connection.
-                    </ErrorAlert.Description>
-                    <ErrorAlert.Action onClick={() => {}}>Retry Connection</ErrorAlert.Action>
-                  </ErrorAlert.Root>
-                  
-                  <ErrorAlert.Root variant="warning">
-                    <ErrorAlert.Title>Low Balance</ErrorAlert.Title>
-                    <ErrorAlert.Description>
-                      Your account balance is low. Please top up to join more tournaments.
-                    </ErrorAlert.Description>
-                  </ErrorAlert.Root>
-                </div>
-                <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-xl">
-                  <Button onClick={() => setIsWinnerModalOpen(true)} size="lg">
-                    Open Winner Modal
+                  <Button href="/login" variant="outline">
+                    Test Auth
                   </Button>
-                  <p className="mt-4 text-sm text-muted-foreground">Click to test the Dialog primitive composition</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Empty States */}
-            <div className="mb-20">
-              <h3 className="text-2xl font-bold text-foreground mb-6">Empty States</h3>
-              <div className="bg-muted/30 rounded-2xl border border-border">
-                <EmptyState.Root>
-                  <EmptyState.Icon icon={Trophy} />
-                  <EmptyState.Title>No Tournaments Yet</EmptyState.Title>
-                  <EmptyState.Description>
-                    You haven&apos;t joined any tournaments. Start your competitive journey today!
-                  </EmptyState.Description>
-                  <EmptyState.Actions>
-                    <Button>Explore Tournaments</Button>
-                  </EmptyState.Actions>
-                </EmptyState.Root>
-              </div>
-            </div>
-
-            {/* Timers */}
-            <div className="mb-16">
-              <h3 className="text-2xl font-bold text-foreground mb-6">Timers</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Countdown
-                  initialSeconds={1800}
-                  size="md"
-                  label="Round 1"
-                  autoStart={false}
-                />
-                <Countdown
-                  initialSeconds={45}
-                  size="md"
-                  variant="danger"
-                  lastMinuteMessage="Hurry Up!"
-                  autoStart={false}
-                />
-                <Countdown
-                  initialSeconds={-120}
-                  size="md"
-                  variant="overtime"
-                  overtimeMessage="Overtime!"
-                  autoStart={false}
-                />
-              </div>
+                  <Button href="/settings" variant="outline">
+                    Review Settings
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
 
-        {/* ========================================
-            LEGACY COMPONENTS (Demos)
-        ======================================== */}
-        
-        <Features
-          title="Everything you need"
-          description="Professional tools for perfect tournaments"
-          variant="muted"
-          features={[
-            {
-              icon: <Zap className="w-8 h-8" />,
-              title: "Lightning Fast",
-              description: "Built with React 19 Server Components for maximum performance."
-            },
-            {
-              icon: <Shield className="w-8 h-8" />,
-              title: "Secure & Reliable",
-              description: "Type-safe APIs and validated data processing ensure smooth runs."
-            },
-            {
-              icon: <Rocket className="w-8 h-8" />,
-              title: "Scalable",
-              description: "Modular components based on Atomic Design principles."
-            }
-          ]}
-        />
-
         <CTA
-          title="Ready for your first tournament?"
-          description="Get started today and experience how simple tournament management can be."
-          buttonText="Sign up for free"
-          buttonHref="/signup"
+          title="Use the landing page as an introduction, not as the whole product"
+          description="Jump into the route that matches the part of the system you want to evaluate first."
+          buttonText="Open the UI showcase"
+          buttonHref="/ui"
           variant="gradient"
         />
       </main>
 
-      {/* ========================================
-          FOOTER
-      ======================================== */}
-      
       <Footer
         brand={{
-          name: "CardArena",
-          description: "Professional tournament management for card games."
+          name: "CardArena Core",
+          description: "A typed, theme-aware frontend core for tournament and competitive gaming products.",
         }}
         columns={[
           {
-            title: "Product",
+            title: "Showcase",
             links: [
-              { label: "Features", href: "#" },
-              { label: "Pricing", href: "#" },
-              { label: "Docs", href: "#" }
-            ]
+              { label: "UI", href: "/ui" },
+              { label: "Login", href: "/login" },
+              { label: "Settings", href: "/settings" },
+            ],
           },
           {
-            title: "Resources",
+            title: "Sections",
             links: [
-              { label: "Community", href: "#" },
-              { label: "Support", href: "#" },
-              { label: "Status", href: "#" }
-            ]
-          }
+              { label: "Overview", href: "#overview" },
+              { label: "Routes", href: "#routes" },
+              { label: "Components", href: "#components" },
+            ],
+          },
         ]}
-        copyright="CardArena Core. All rights reserved."
+        copyright={`CardArena Core v${version}`}
         variant="dark"
       />
-
-      {/* Winner Modal Composition */}
-      <WinnerModal.Root open={isWinnerModalOpen} onOpenChange={setIsWinnerModalOpen}>
-        <WinnerModal.Portal>
-          <WinnerModal.Overlay />
-          <WinnerModal.Content>
-            <WinnerModal.Title>Select Winner</WinnerModal.Title>
-            <WinnerModal.Options>
-              <WinnerModal.Option onClick={() => setIsWinnerModalOpen(false)}>
-                Alice Johnson
-              </WinnerModal.Option>
-              <WinnerModal.Option onClick={() => setIsWinnerModalOpen(false)}>
-                Bob Smith
-              </WinnerModal.Option>
-            </WinnerModal.Options>
-            <WinnerModal.Cancel onClick={() => setIsWinnerModalOpen(false)}>Cancel</WinnerModal.Cancel>
-            <WinnerModal.Stripe />
-          </WinnerModal.Content>
-        </WinnerModal.Portal>
-      </WinnerModal.Root>
     </div>
   );
 }

@@ -77,11 +77,7 @@ export function MatchCard({
           <span className="text-[10px] font-black uppercase tracking-tighter text-muted-foreground">
             T{match.tableNumber} • R{match.round}
           </span>
-          {isComplete ? (
-            <span role="img" aria-label="Winner selected" className="text-[10px]">
-              🏆
-            </span>
-          ) : null}
+          {isComplete ? <Badge variant="success" size="sm">Done</Badge> : null}
         </div>
 
         <div className="space-y-1">
@@ -143,11 +139,6 @@ export function MatchCard({
                 )}
               >
                 {player.name}
-                {isWinner ? (
-                  <span role="img" aria-label="Winner" className="ml-2">
-                    🏆
-                  </span>
-                ) : null}
               </p>
             );
           })}

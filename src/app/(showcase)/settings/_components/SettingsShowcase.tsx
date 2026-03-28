@@ -5,9 +5,12 @@ import { Bell, CreditCard, Info, Lock, Mail, User } from "lucide-react";
 import { AmbientBackground } from "@/components/effects/AmbientBackground";
 import { TabSection } from "@/components/composed/TabSection";
 import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
+import { Modal } from "@/components/ui/Modal";
+import { LoadingState } from "@/components/ui/LoadingSpinner";
 import { PageHeader, PageHeaderContent, PageHeaderDescription, PageHeaderHeading } from "@/components/ui/PageHeader";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Switch } from "@/components/ui/Switch";
@@ -62,7 +65,7 @@ export function SettingsShowcase({
     setIsLoading(true);
     setMessage(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 1400));
 
     setIsLoading(false);
     setMessage({ type: "success", text: "Settings saved successfully." });
@@ -86,33 +89,36 @@ export function SettingsShowcase({
       </PageHeader>
 
       <div className="grid gap-6 md:grid-cols-[240px_minmax(0,1fr)]">
-        <nav aria-label="Settings sections" className="rounded-2xl border border-border bg-card p-2 shadow-sm">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
+        <nav aria-label="Settings sections" className="rounded-2xl border border-border bg-card p-3 shadow-sm">
+          <div className="space-y-2">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
 
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={cn(
-                  "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                )}
-                aria-current={isActive ? "page" : undefined}
-              >
-                <Icon className="h-5 w-5" aria-hidden="true" />
-                {tab.label}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                  )}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <Icon className="h-5 w-5" aria-hidden="true" />
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
         </nav>
 
-        <div>
-          {activeTab === "account" ? (
+        <Card className="border-border/80 bg-card/95 shadow-sm backdrop-blur-sm">
+          <CardContent className="p-6 sm:p-8">
+            {activeTab === "account" ? (
             <TabSection
               title="Account Information"
               description="Update your profile and login identity."
@@ -169,9 +175,9 @@ export function SettingsShowcase({
                 </div>
               </form>
             </TabSection>
-          ) : null}
+            ) : null}
 
-          {activeTab === "security" ? (
+            {activeTab === "security" ? (
             <TabSection
               title="Security"
               description="Manage passwords and session protections."
@@ -215,9 +221,9 @@ export function SettingsShowcase({
                 </Button>
               </form>
             </TabSection>
-          ) : null}
+            ) : null}
 
-          {activeTab === "notifications" ? (
+            {activeTab === "notifications" ? (
             <TabSection
               title="Notifications"
               description="Choose which updates should reach the user."
@@ -249,9 +255,9 @@ export function SettingsShowcase({
                 </Button>
               </form>
             </TabSection>
-          ) : null}
+            ) : null}
 
-          {activeTab === "billing" ? (
+            {activeTab === "billing" ? (
             <TabSection
               title="Billing"
               description="Manage plan information and payment details."
@@ -304,9 +310,32 @@ export function SettingsShowcase({
                 </form>
               </div>
             </TabSection>
-          ) : null}
-        </div>
+            ) : null}
+          </CardContent>
+        </Card>
       </div>
+
+      <Modal
+        open={isLoading}
+        onOpenChange={() => {}}
+        loading
+        showClose={false}
+        className="sm:max-w-md"
+      >
+        <Modal.Header className="text-center">
+          <Modal.Title>Updating settings</Modal.Title>
+          <Modal.Description>
+            Applying your changes and syncing the latest preferences.
+          </Modal.Description>
+        </Modal.Header>
+        <LoadingState
+          size="lg"
+          variant="primary"
+          message="Saving your latest changes..."
+          className="py-4"
+          messageClassName="text-sm font-medium"
+        />
+      </Modal>
     </AmbientBackground>
   );
 }

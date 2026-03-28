@@ -191,7 +191,7 @@ export function LoadingStateCustomExample() {
  */
 export function SpinnerInCardExample() {
   return (
-    <Card>
+    <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           Recent Activity
