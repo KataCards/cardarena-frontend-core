@@ -30,7 +30,7 @@ import { PasswordInput } from "@/components/ui/PasswordInput";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { Label } from "@/components/ui/Label";
 import { FieldError } from "@/components/ui/FieldError";
-import { WinnerModal } from "@/components/ui/WinnerModal";
+import { WinnerModal } from "@/components/modals/WinnerModal";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
 import { EmptyState } from "@/components/ui/EmptyState";
 
