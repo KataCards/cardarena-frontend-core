@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ButtonExamples from "../_components/ButtonsExamples";
+import * as CountdownExamples from "../_components/CountdownExamples";
 import * as ComposedExamples from "../_components/ComposedExamples";
 import * as InputExamples from "../_components/InputExamples";
 import * as PageHeaderExamples from "../_components/PageHeaderExamples";
@@ -38,6 +39,15 @@ const sections: ShowcaseSection[] = [
       { title: "Button States", component: ButtonExamples.ButtonStatesExample },
       { title: "Badge Variants", component: ButtonExamples.BadgeVariantsExample },
       { title: "Badge Sizes", component: ButtonExamples.BadgeSizesExample },
+    ],
+  },
+  {
+    title: "Countdown",
+    description: "Time-based UI for rounds, warnings, and paused states.",
+    items: [
+      { title: "Basic Countdown", component: CountdownExamples.BasicCountdownExample },
+      { title: "Warning State", component: CountdownExamples.WarningCountdownExample },
+      { title: "Paused Countdown", component: CountdownExamples.PausedCountdownExample },
     ],
   },
   {
