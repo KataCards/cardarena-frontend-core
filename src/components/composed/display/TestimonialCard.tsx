@@ -48,10 +48,10 @@ export function TestimonialCard({
 }: TestimonialCardProps) {
   return (
     <Card className={cn("h-full shadow-sm", variantStyles[variant], className)} {...props}>
-      <CardContent className="p-8">
+      <CardContent className="p-8 pt-9">
         {rating > 0 ? (
           <div
-            className="mb-4 flex"
+            className="mb-4 flex gap-1 pb-1"
             aria-label={`${rating} out of 5 stars`}
             role="img"
           >

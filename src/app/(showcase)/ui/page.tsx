@@ -151,7 +151,7 @@ export default function ShowcaseUiPage() {
       className="min-h-screen"
       contentClassName="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8"
     >
-      <PageHeader className="mb-10">
+      <PageHeader className="mt-10 mb-10">
         <PageHeaderContent>
           <PageHeaderHeading>UI Showcase</PageHeaderHeading>
           <PageHeaderDescription>

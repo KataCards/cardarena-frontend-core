@@ -118,7 +118,10 @@ export const RankedList = React.forwardRef<HTMLDivElement, RankedListProps>(
           </CardHeader>
         ) : null}
 
-        <CardContent className={cn("space-y-3 overflow-y-auto pr-1", title ? undefined : "pt-6")} style={{ maxHeight }}>
+        <CardContent
+          className={cn("space-y-3 overflow-y-auto", title ? undefined : "pt-6")}
+          style={{ maxHeight, scrollbarGutter: "stable both-edges" }}
+        >
           <div role="list" className="space-y-3">
             {items.map((item) => {
               const ItemIcon = item.icon;

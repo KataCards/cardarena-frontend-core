@@ -43,3 +43,6 @@ next-env.d.ts
 # internal documentation
 *.md
 !README.md
+
+# ai assistence
+.mcp.json
