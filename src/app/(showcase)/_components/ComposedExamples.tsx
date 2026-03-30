@@ -103,9 +103,9 @@ const bracketMatchesExample: readonly BracketMatch[] = [
     tableNumber: 3,
     round: 1,
     status: "completed",
-    winner: "Dev Malik",
+    winner: "CoolUpCards",
     players: [
-      { name: "Dev Malik", isWinner: true },
+      { name: "CoolUpCards", isWinner: true },
       { name: "Iris Quinn", isLoser: true },
     ],
   },
@@ -210,7 +210,7 @@ export function TestimonialsExample() {
           rating: 5,
         },
         {
-          name: "Dev Malik",
+          name: "John Fortnite",
           role: "Frontend Lead",
           content:
             "The semantic token work made dark mode and future theming changes much less risky than before.",
