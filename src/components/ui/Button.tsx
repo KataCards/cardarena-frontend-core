@@ -1,4 +1,6 @@
 import * as React from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
@@ -7,11 +9,9 @@ import { cn } from "@/lib/utils";
  * Renders as <button> by default, or <a> when href is provided.
  * Button-specific props (type, form, etc.) are filtered when rendering as anchor.
  */
-export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Visual style variant. @default "default" */
-  variant?: "default" | "secondary" | "outline" | "ghost" | "destructive";
-  /** Button size. @default "md" */
-  size?: "sm" | "md" | "lg";
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
   /** If true, button takes full width of container. @default false */
   fullWidth?: boolean;
   /** Button content */
@@ -24,27 +24,40 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   iconPosition?: "left" | "right";
   /** Link relation type. Defaults to "noopener noreferrer" for security when href is present. */
   rel?: string;
+  /** Render polymorphically by passing styles/behavior to the child element. */
+  asChild?: boolean;
 }
 
 /**
  * Semantic variant styles using theme tokens
  */
-const variantStyles = {
-  default: "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring",
-  secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus-visible:ring-ring",
-  outline: "border-2 border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring",
-  ghost: "text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring",
-  destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-ring",
-};
-
-/**
- * Size styles
- */
-const sizeStyles = {
-  sm: "px-4 py-1.5 text-sm",
-  md: "px-6 py-2 text-base",
-  lg: "px-8 py-4 text-lg",
-};
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 focus-visible:ring-ring",
+        outline:
+          "border-2 border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring",
+        ghost:
+          "text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 focus-visible:ring-ring",
+      },
+      size: {
+        sm: "px-4 py-1.5 text-sm",
+        md: "px-6 py-2 text-base",
+        lg: "px-8 py-4 text-lg",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+    },
+  }
+);
 
 /**
  * Icon size mapping
@@ -124,61 +137,40 @@ export const Button = React.forwardRef<
       href,
       icon: Icon,
       iconPosition = "left",
+      asChild = false,
       className,
       rel,
       ...props
     },
     ref
   ) => {
-    const baseStyles =
-      "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+    const resolvedSize = size ?? "md";
 
     const classes = cn(
-      baseStyles,
-      sizeStyles[size],
+      buttonVariants({ variant, size: resolvedSize }),
       fullWidth && "w-full",
-      variantStyles[variant],
       className
     );
 
     const content = (
       <>
         {Icon && iconPosition === "left" && (
-          <Icon className={iconSizeMap[size]} aria-hidden="true" />
+          <Icon className={iconSizeMap[resolvedSize]} aria-hidden="true" />
         )}
         {children}
         {Icon && iconPosition === "right" && (
-          <Icon className={iconSizeMap[size]} aria-hidden="true" />
+          <Icon className={iconSizeMap[resolvedSize]} aria-hidden="true" />
         )}
       </>
     );
 
-    if (href) {
-      // Filter out button-specific props that shouldn't be on anchor elements
-      const {
-        type: _type,
-        form: _form,
-        formAction: _formAction,
-        formEncType: _formEncType,
-        formMethod: _formMethod,
-        formNoValidate: _formNoValidate,
-        formTarget: _formTarget,
-        ...anchorProps
-      } = props;
-      void _type;
-      void _form;
-      void _formAction;
-      void _formEncType;
-      void _formMethod;
-      void _formNoValidate;
-      void _formTarget;
-
+    if (href && !asChild) {
       return (
         <a
           ref={ref as React.Ref<HTMLAnchorElement>}
           href={href}
           rel={rel ?? "noopener noreferrer"}
-          {...(anchorProps as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+          {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
           className={classes}
         >
           {content}
@@ -186,14 +178,16 @@ export const Button = React.forwardRef<
       );
     }
 
+    const Comp = asChild ? Slot : "button";
+
     return (
-      <button
+      <Comp
         ref={ref as React.Ref<HTMLButtonElement>}
         {...props}
         className={classes}
       >
         {content}
-      </button>
+      </Comp>
     );
   }
 );

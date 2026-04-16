@@ -1,6 +1,9 @@
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 /**
- * Merges class names into a single string, filtering out falsy values
+ * Merges class names and resolves Tailwind conflicts deterministically.
  */
-export function cn(...inputs: (string | undefined | null | false)[]) {
-  return inputs.filter(Boolean).join(" ");
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }

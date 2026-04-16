@@ -1,7 +1,9 @@
 import * as React from "react";
+import * as LabelPrimitive from "@radix-ui/react-label";
 import { cn } from "@/lib/utils";
 
-export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
+export interface LabelProps
+  extends React.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> {
   /** Whether the field is required (adds visual indicator) */
   required?: boolean;
 }
@@ -36,7 +38,7 @@ export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> 
  */
 export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
   ({ required, className, children, ...props }, ref) => (
-    <label
+    <LabelPrimitive.Root
       ref={ref}
       className={cn(
         "block text-sm font-medium text-foreground mb-1.5",
@@ -46,7 +48,7 @@ export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
     >
       {children}
       {required && <span className="text-destructive ml-1" aria-label="required">*</span>}
-    </label>
+    </LabelPrimitive.Root>
   )
 );
 

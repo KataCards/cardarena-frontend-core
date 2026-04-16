@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ButtonExamples from "../_components/ButtonsExamples";
 import * as CountdownExamples from "../_components/CountdownExamples";
 import * as ComposedExamples from "../_components/ComposedExamples";
+import * as FlipCardExamples from "../_components/FlipCardExamples";
 import * as InputExamples from "../_components/InputExamples";
 import * as PageHeaderExamples from "../_components/PageHeaderExamples";
 import * as SpinnerExamples from "../_components/SpinnerExamples";
@@ -67,6 +68,19 @@ const sections: ShowcaseSection[] = [
         component: ComposedExamples.TestimonialsExample,
         fullWidth: true,
       },
+    ],
+  },
+  {
+    title: "Flip Cards",
+    description: "3D flip card animations with SSR-friendly CSS and interactive variants.",
+    items: [
+      { title: "Basic Hover Flip", component: FlipCardExamples.BasicFlipCardExample },
+      { title: "Player Card", component: FlipCardExamples.PlayerCardFlipExample },
+      { title: "Stats Card", component: FlipCardExamples.StatsCardFlipExample },
+      { title: "Click to Flip", component: FlipCardExamples.ClickToFlipExample },
+      { title: "Controlled State", component: FlipCardExamples.ControlledFlipExample },
+      { title: "Vertical Flip", component: FlipCardExamples.VerticalFlipExample },
+      { title: "Custom Duration", component: FlipCardExamples.CustomDurationExample },
     ],
   },
   {
