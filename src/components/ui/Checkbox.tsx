@@ -1,209 +1,74 @@
 "use client";
 
 import * as React from "react";
+import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
+import { Check, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type CheckboxSize = "sm" | "md" | "lg";
 type CheckboxColorScheme = "red" | "dark" | "gray";
 
 export interface CheckboxProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "type"> {
-  /** Whether the checkbox is checked */
-  checked?: boolean;
-  /** Whether the checkbox is in an indeterminate state */
-  indeterminate?: boolean;
-  /** Visible label rendered next to the checkbox */
-  label?: React.ReactNode;
-  /** Supporting text rendered below the label */
-  description?: string;
-  /** Checkbox size. @default "md" */
+  extends Omit<React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>, "size"> {
   size?: CheckboxSize;
-  /** Color scheme for the checked state. @default "red" */
   colorScheme?: CheckboxColorScheme;
-  /** Whether the checkbox is disabled */
-  disabled?: boolean;
-  /** Additional CSS classes for the root wrapper */
-  className?: string;
+  indeterminate?: boolean;
 }
 
-const sizeStyles: Record<CheckboxSize, { box: string; icon: string; label: string; description: string }> = {
-  sm: { box: "h-3.5 w-3.5 rounded", icon: "h-2 w-2", label: "text-sm", description: "text-xs" },
-  md: { box: "h-4.5 w-4.5 rounded-md", icon: "h-2.5 w-2.5", label: "text-sm", description: "text-xs" },
-  lg: { box: "h-5.5 w-5.5 rounded-md", icon: "h-3 w-3", label: "text-base", description: "text-sm" },
+const sizeStyles: Record<CheckboxSize, { box: string; icon: string }> = {
+  sm: { box: "h-4 w-4", icon: "h-3 w-3" },
+  md: { box: "h-5 w-5", icon: "h-3.5 w-3.5" },
+  lg: { box: "h-6 w-6", icon: "h-4 w-4" },
 };
 
-const colorStyles: Record<CheckboxColorScheme, { checked: string; focus: string }> = {
-  red: { checked: "bg-primary border-primary", focus: "focus-visible:ring-ring" },
-  dark: { checked: "bg-foreground border-foreground", focus: "focus-visible:ring-ring" },
-  gray: { checked: "bg-muted-foreground border-muted-foreground", focus: "focus-visible:ring-ring" },
+const colorStyles: Record<CheckboxColorScheme, string> = {
+  red: "data-[state=checked]:bg-primary data-[state=checked]:border-primary data-[state=indeterminate]:bg-primary data-[state=indeterminate]:border-primary",
+  dark: "data-[state=checked]:bg-foreground data-[state=checked]:border-foreground data-[state=indeterminate]:bg-foreground data-[state=indeterminate]:border-foreground",
+  gray: "data-[state=checked]:bg-muted-foreground data-[state=checked]:border-muted-foreground data-[state=indeterminate]:bg-muted-foreground data-[state=indeterminate]:border-muted-foreground",
 };
 
-/** Checkmark SVG */
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 10 8"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <polyline points="1 4 3.5 6.5 9 1" />
-    </svg>
-  );
-}
-
-/** Indeterminate dash SVG */
-function IndeterminateIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 10 2"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <line x1="1" y1="1" x2="9" y2="1" />
-    </svg>
-  );
-}
-
-/**
- * Checkbox
- *
- * An accessible checkbox with optional label and description.
- * Supports checked, unchecked, and indeterminate states.
- * Supports 3 sizes, 3 color schemes, and disabled state.
- *
- * Always pair with a visible label or aria-label for accessibility.
- *
- * @example
- * const [agreed, setAgreed] = useState(false);
- * <Checkbox
- *   checked={agreed}
- *   onChange={(e) => setAgreed(e.target.checked)}
- *   label="I agree to the terms"
- * />
- *
- * @example
- * <Checkbox
- *   checked={allSelected}
- *   indeterminate={someSelected}
- *   onChange={handleSelectAll}
- *   label="Select all"
- *   size="lg"
- *   colorScheme="dark"
- * />
- */
-export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
+export const Checkbox = React.forwardRef<HTMLButtonElement, CheckboxProps>(
   (
     {
-      checked = false,
-      indeterminate = false,
-      label,
-      description,
       size = "md",
       colorScheme = "red",
-      disabled = false,
+      indeterminate = false,
+      checked,
       className,
-      id: providedId,
-      "aria-label": ariaLabel,
-      "aria-describedby": ariaDescribedBy,
+      children,
       ...props
     },
     ref
   ) => {
-    const internalRef = React.useRef<HTMLInputElement>(null);
-    const resolvedRef = (ref as React.RefObject<HTMLInputElement>) ?? internalRef;
-    const generatedId = React.useId();
-    const id = providedId ?? generatedId;
-    const descriptionId = description ? `${id}-description` : undefined;
-
-    // Sync indeterminate state — this can only be set via JS, not HTML
-    React.useEffect(() => {
-      if (resolvedRef.current) {
-        resolvedRef.current.indeterminate = indeterminate;
-      }
-    }, [indeterminate, resolvedRef]);
-
     const sz = sizeStyles[size];
-    const color = colorStyles[colorScheme];
-    const isActive = checked || indeterminate;
+    const resolvedChecked = indeterminate ? "indeterminate" : checked;
 
     return (
-      <div className={cn("flex items-start gap-2.5", className)}>
-        {/* Hidden native input — drives all accessibility */}
-        <div className="relative shrink-0 flex items-center justify-center mt-0.5">
-          <input
-            ref={resolvedRef}
-            id={id}
-            type="checkbox"
-            checked={checked}
-            disabled={disabled}
-            aria-label={!label ? ariaLabel : undefined}
-            aria-describedby={descriptionId ?? ariaDescribedBy}
-            aria-checked={indeterminate ? "mixed" : checked}
-            className={cn(
-              "absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10",
-              disabled && "cursor-not-allowed"
-            )}
-            {...props}
-          />
-          {/* Visual box */}
-          <div
-            className={cn(
-              "flex items-center justify-center border-2 transition-all duration-150",
-              sz.box,
-              isActive
-                ? color.checked
-                : "border-input bg-background hover:border-muted-foreground",
-              disabled && "opacity-50",
-              // Focus ring follows the native input focus, proxied via peer
-              "peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2",
-              color.focus
-            )}
-            aria-hidden="true"
-          >
-            {indeterminate ? (
-              <IndeterminateIcon className={cn("text-white", sz.icon)} />
-            ) : checked ? (
-              <CheckIcon className={cn("text-white", sz.icon)} />
-            ) : null}
-          </div>
-        </div>
-
-        {/* Label + description */}
-        {(label || description) && (
-          <div className="flex flex-col gap-0.5">
-            {label && (
-              <label
-                htmlFor={id}
-                className={cn(
-                  "font-medium text-foreground leading-snug select-none",
-                  sz.label,
-                  disabled && "opacity-50 cursor-not-allowed"
-                )}
-              >
-                {label}
-              </label>
-            )}
-            {description && (
-              <p
-                id={descriptionId}
-                className={cn("text-muted-foreground leading-snug", sz.description)}
-              >
-                {description}
-              </p>
-            )}
-          </div>
+      <CheckboxPrimitive.Root
+        ref={ref}
+        checked={resolvedChecked}
+        className={cn(
+          "inline-flex items-center justify-center rounded-md border-2 border-input bg-background",
+          "transition-colors",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "disabled:cursor-not-allowed disabled:opacity-50",
+          sz.box,
+          colorStyles[colorScheme],
+          className
         )}
-      </div>
+        {...props}
+      >
+        <CheckboxPrimitive.Indicator className="text-white">
+          {resolvedChecked === "indeterminate" ? (
+            <Minus className={sz.icon} />
+          ) : (
+            <Check className={sz.icon} />
+          )}
+        </CheckboxPrimitive.Indicator>
+        {children}
+      </CheckboxPrimitive.Root>
     );
   }
 );
+
 Checkbox.displayName = "Checkbox";

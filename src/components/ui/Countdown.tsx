@@ -101,6 +101,7 @@ export function Countdown({
   const [timeLeft, setTimeLeft] = useState(initialSeconds);
   const onTimeUpRef = useRef(onTimeUp);
   const onTickRef = useRef(onTick);
+  const startTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     onTimeUpRef.current = onTimeUp;
@@ -108,15 +109,26 @@ export function Countdown({
   }, [onTimeUp, onTick]);
 
   useEffect(() => {
-    setTimeLeft(initialSeconds);
+    const timeoutId = setTimeout(() => {
+      setTimeLeft(initialSeconds);
+      startTimeRef.current = Date.now();
+    }, 0);
+
+    return () => clearTimeout(timeoutId);
   }, [initialSeconds]);
 
   useEffect(() => {
     if (!autoStart || isPaused) return;
 
     const interval = setInterval(() => {
+      if (startTimeRef.current === null) {
+        startTimeRef.current = Date.now();
+      }
+
+      const elapsedSeconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      const next = initialSeconds - elapsedSeconds;
+
       setTimeLeft((prev) => {
-        const next = prev - 1;
         if (prev > 0 && next <= 0) onTimeUpRef.current?.();
         onTickRef.current?.(next);
         return next;
@@ -124,7 +136,7 @@ export function Countdown({
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [autoStart, isPaused]);
+  }, [autoStart, initialSeconds, isPaused]);
 
   const variant: CountdownVariant =
     forcedVariant ||

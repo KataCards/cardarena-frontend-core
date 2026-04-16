@@ -7,6 +7,7 @@ import { TabSection } from "@/components/composed/TabSection";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Checkbox } from "@/components/ui/Checkbox";
+import { FormItem } from "@/components/ui/FormItem";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { Modal } from "@/components/ui/Modal";
@@ -232,24 +233,33 @@ export function SettingsShowcase({
               maxWidth="full"
             >
               <form onSubmit={handleSubmit} className="space-y-6">
-                <Switch
-                  checked={weeklyDigestEnabled}
-                  onChange={(event) => setWeeklyDigestEnabled(event.target.checked)}
+                <FormItem
                   label="Weekly digest"
                   description="Send a weekly summary of platform activity."
-                />
-                <Switch
-                  checked={pushEnabled}
-                  onChange={(event) => setPushEnabled(event.target.checked)}
+                >
+                  <Switch
+                    checked={weeklyDigestEnabled}
+                    onCheckedChange={setWeeklyDigestEnabled}
+                  />
+                </FormItem>
+                <FormItem
                   label="Browser push notifications"
                   description="Notify the user when match state changes."
-                />
-                <Checkbox
-                  checked={marketingEnabled}
-                  onChange={(event) => setMarketingEnabled(event.target.checked)}
+                >
+                  <Switch
+                    checked={pushEnabled}
+                    onCheckedChange={setPushEnabled}
+                  />
+                </FormItem>
+                <FormItem
                   label="Product announcements"
                   description="Receive updates about launches and product news."
-                />
+                >
+                  <Checkbox
+                    checked={marketingEnabled}
+                    onCheckedChange={(next) => setMarketingEnabled(next === true)}
+                  />
+                </FormItem>
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? "Saving..." : "Save Preferences"}
                 </Button>

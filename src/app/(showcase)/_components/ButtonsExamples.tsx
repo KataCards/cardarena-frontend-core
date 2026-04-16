@@ -1,4 +1,5 @@
 import { ArrowRight, CheckCircle2, Rocket, ShieldAlert, Sparkles, Zap } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
@@ -50,6 +51,9 @@ export function ButtonStatesExample() {
       <Button fullWidth>Full Width Action</Button>
       <Button fullWidth variant="secondary" disabled>
         Disabled Action
+      </Button>
+      <Button asChild variant="outline" fullWidth>
+        <Link href="/ui">asChild + Link</Link>
       </Button>
     </div>
   );

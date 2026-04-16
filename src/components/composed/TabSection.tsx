@@ -1,6 +1,6 @@
 import * as React from "react";
 import { CheckCircle, LucideIcon } from "lucide-react";
-import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { Alert } from "@/components/ui/Alert";
 import { cn } from "@/lib/utils";
 
 type TabSectionHeading = "h1" | "h2" | "h3" | "h4";
@@ -73,9 +73,9 @@ export function TabSection({
       </div>
 
       {error ? (
-        <ErrorAlert.Root className="mb-6">
-          <ErrorAlert.Description>{error}</ErrorAlert.Description>
-        </ErrorAlert.Root>
+        <Alert.Root className="mb-6">
+          <Alert.Description>{error}</Alert.Description>
+        </Alert.Root>
       ) : null}
 
       {success ? (

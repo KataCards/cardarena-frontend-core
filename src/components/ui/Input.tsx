@@ -6,6 +6,8 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   leftSlot?: React.ReactNode;
   /** Optional right slot for icons, buttons, or suffix text */
   rightSlot?: React.ReactNode;
+  /** Additional CSS classes for the outer container */
+  containerClassName?: string;
 }
 
 /**
@@ -54,12 +56,12 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
  * />
  */
 export const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ leftSlot, rightSlot, className, ...props }, ref) => {
+  ({ leftSlot, rightSlot, containerClassName, className, ...props }, ref) => {
     const hasLeftSlot = Boolean(leftSlot);
     const hasRightSlot = Boolean(rightSlot);
 
     return (
-      <div className="relative w-full">
+      <div className={cn("relative w-full", containerClassName)}>
         {leftSlot && (
           <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
             {leftSlot}

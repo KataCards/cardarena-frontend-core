@@ -1,16 +1,15 @@
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
  * Props for the Badge component
  */
-export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLSpanElement>,
+    VariantProps<typeof badgeVariants> {
   /** Content to display inside the badge */
   children: React.ReactNode;
-  /** Visual variant - determines color scheme. @default "default" */
-  variant?: "default" | "secondary" | "success" | "warning" | "destructive" | "info" | "outline";
-  /** Badge size. @default "md" */
-  size?: "sm" | "md" | "lg";
   /** Optional icon component to display before text. Should accept className and size props. */
   icon?: React.ComponentType<{ className?: string; size?: number }>;
 }
@@ -18,24 +17,28 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 /**
  * Semantic variant styles using theme tokens
  */
-const variantStyles = {
-  default: "bg-primary text-primary-foreground border-primary",
-  secondary: "bg-secondary text-secondary-foreground border-secondary",
-  success: "bg-success text-success-foreground border-success",
-  warning: "bg-warning text-warning-foreground border-warning",
-  destructive: "bg-destructive text-destructive-foreground border-destructive",
-  info: "bg-info text-info-foreground border-info",
-  outline: "bg-background text-foreground border-border",
-};
-
-/**
- * Size styles
- */
-const sizeStyles = {
-  sm: "text-xs px-2 py-0.5",
-  md: "text-sm px-2.5 py-0.5",
-  lg: "text-base px-3 py-1",
-};
+const badgeVariants = cva("inline-flex items-center gap-1 font-medium rounded-full border", {
+  variants: {
+    variant: {
+      default: "bg-primary text-primary-foreground border-primary",
+      secondary: "bg-secondary text-secondary-foreground border-secondary",
+      success: "bg-success text-success-foreground border-success",
+      warning: "bg-warning text-warning-foreground border-warning",
+      destructive: "bg-destructive text-destructive-foreground border-destructive",
+      info: "bg-info text-info-foreground border-info",
+      outline: "bg-background text-foreground border-border",
+    },
+    size: {
+      sm: "text-xs px-2 py-0.5",
+      md: "text-sm px-2.5 py-0.5",
+      lg: "text-base px-3 py-1",
+    },
+  },
+  defaultVariants: {
+    variant: "default",
+    size: "md",
+  },
+});
 
 /**
  * Icon size mapping
@@ -99,21 +102,21 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   (
     {
       children,
-      variant = "default",
-      size = "md",
+      variant,
+      size,
       icon: Icon,
       className,
       ...rest
     },
     ref
   ) => {
+    const resolvedSize = size ?? "md";
+
     return (
       <span
         ref={ref}
         className={cn(
-          "inline-flex items-center gap-1 font-medium rounded-full border",
-          variantStyles[variant],
-          sizeStyles[size],
+          badgeVariants({ variant, size }),
           className
         )}
         {...rest}
@@ -121,7 +124,7 @@ export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
         {Icon && (
           <Icon
             className="shrink-0"
-            size={iconSizeMap[size]}
+            size={iconSizeMap[resolvedSize]}
             aria-hidden="true"
           />
         )}

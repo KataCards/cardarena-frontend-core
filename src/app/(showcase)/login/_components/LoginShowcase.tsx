@@ -7,7 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { AmbientBackground } from "@/components/effects/AmbientBackground";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
-import { ErrorAlert } from "@/components/ui/ErrorAlert";
+import { Alert } from "@/components/ui/Alert";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
 import { PasswordInput } from "@/components/ui/PasswordInput";
@@ -101,10 +101,10 @@ export function LoginShowcase({
 
           <CardContent>
             {error ? (
-              <ErrorAlert.Root className="mb-6">
-                <ErrorAlert.Title as="h3">Unable to sign in</ErrorAlert.Title>
-                <ErrorAlert.Description>{error}</ErrorAlert.Description>
-              </ErrorAlert.Root>
+              <Alert.Root className="mb-6">
+                <Alert.Title as="h3">Unable to sign in</Alert.Title>
+                <Alert.Description>{error}</Alert.Description>
+              </Alert.Root>
             ) : null}
 
             <form onSubmit={handleSubmit} className="space-y-5">

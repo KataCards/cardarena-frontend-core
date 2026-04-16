@@ -4,9 +4,7 @@ import * as React from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-
-type Theme = "light" | "dark";
-const themeStorageKey = "theme";
+import { useTheme } from "next-themes";
 
 const sizeStyles = {
   sm: "h-11 w-11",
@@ -24,21 +22,6 @@ export interface ThemeToggleProps extends Omit<React.ComponentProps<typeof Butto
   size?: keyof typeof sizeStyles;
 }
 
-function applyTheme(theme: Theme) {
-  const root = document.documentElement;
-  root.classList.remove("light", "dark");
-  root.classList.add(theme);
-  root.dataset.theme = theme;
-}
-
-function getResolvedTheme(): Theme {
-  if (typeof document === "undefined") {
-    return "light";
-  }
-
-  return document.documentElement.classList.contains("dark") ? "dark" : "light";
-}
-
 export const ThemeToggle = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ThemeToggleProps>(
   (
     {
@@ -50,19 +33,14 @@ export const ThemeToggle = React.forwardRef<HTMLButtonElement | HTMLAnchorElemen
     ref
   ) => {
     const [mounted, setMounted] = React.useState(false);
-    const [theme, setTheme] = React.useState<Theme>("light");
+    const { resolvedTheme, setTheme } = useTheme();
 
     React.useEffect(() => {
-      const resolvedTheme = getResolvedTheme();
-      setTheme(resolvedTheme);
       setMounted(true);
     }, []);
 
     function handleToggle() {
-      const nextTheme: Theme = theme === "dark" ? "light" : "dark";
-      applyTheme(nextTheme);
-      localStorage.setItem(themeStorageKey, nextTheme);
-      setTheme(nextTheme);
+      setTheme(resolvedTheme === "dark" ? "light" : "dark");
     }
 
     if (!mounted) {
@@ -97,10 +75,10 @@ export const ThemeToggle = React.forwardRef<HTMLButtonElement | HTMLAnchorElemen
           "rounded-full border-border bg-background/90 p-0 shadow-lg backdrop-blur",
           className
         )}
-        aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
         {...props}
       >
-        {theme === "dark" ? (
+        {resolvedTheme === "dark" ? (
           <Sun className={iconStyles[size]} aria-hidden="true" />
         ) : (
           <Moon className={iconStyles[size]} aria-hidden="true" />
